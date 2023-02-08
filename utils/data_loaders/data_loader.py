@@ -1,12 +1,12 @@
 import os
 import torch
+device = torch.device("cuda:0")
 from torchvision.io import read_image
 from torch.utils.data import Dataset
 from PIL import Image
 from torchvision import transforms
 from torchvision.transforms import ToTensor
 import numpy as np
-
 
 class CustomImageDataset(Dataset):
     def __init__(self, image_dir):
@@ -31,7 +31,7 @@ class CustomImageDataset(Dataset):
         image = np.array(Image.open(image_path).convert('RGB'))
         image = self.transform(image)
         label = self.get_label_from_filename(image_name)
-        return image, label
+        return image.to(device), label
 
     def get_label_from_filename(self, image_name):
         file_name = image_name.replace('.png', '')
@@ -44,6 +44,7 @@ class CustomImageDataset(Dataset):
         train_dataset, test_dataset = torch.utils.data.random_split(
             self, [train_size, test_size])
 
+        train_dataset = train_dataset
         return torch.utils.data.DataLoader(
             train_dataset, batch_size=32, shuffle=True), torch.utils.data.DataLoader(
             test_dataset, batch_size=32, shuffle=True)
