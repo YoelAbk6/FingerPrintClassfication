@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 from PIL import Image
 from torchvision import transforms
 from torchvision.transforms import ToTensor
-import cv2
+import numpy as np
 
 
 class CustomImageDataset(Dataset):
@@ -28,7 +28,7 @@ class CustomImageDataset(Dataset):
     def __getitem__(self, idx):
         image_name = os.listdir(self.image_dir)[idx]
         image_path = os.path.join(self.image_dir, image_name)
-        image = cv2.imread(image_path)
+        image = np.array(Image.open(image_path).convert('RGB'))
         image = self.transform(image)
         label = self.get_label_from_filename(image_name)
         return image, label
