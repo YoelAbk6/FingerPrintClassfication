@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES']='3,4'
+os.environ['CUDA_VISIBLE_DEVICES'] = '3,4'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 from utils.data_loaders.data_loader import CustomImageDataset
 from utils.models.lists_generator import *
@@ -10,11 +10,15 @@ full_train_epochs = 30
 
 
 def main():
+
+    device = torch.device("cpu")
+    if torch.cuda.is_available():
+        device = torch.device("cuda:0")
+
     # Load data
-    path = 'data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png\\equal'
+    # path = 'data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png'
     path = '/home/uoriko/FingerPrintClassfication/data/equal'
-    device = torch.device("cuda:0")
-    data = CustomImageDataset(path)
+    data = CustomImageDataset(path, device)
     train_dataloader, test_dataloader = data.get_train_and_test_data()
 
     # Generate lists
@@ -32,16 +36,17 @@ def main():
         loss_name, loss = loss_tuple
         optimizer_name, optimizer = optimizer_tuple
         lr_name, lr = lr_tuple
+        print('=================================================================================================')
         print(
             f'Start training with - Model: {model_name}, Loss: {loss_name}, Optimizer: {optimizer_name}, Learning Rate: {lr_name}')
-
+        print('=================================================================================================')
         model = nn.DataParallel(model)
         model.to(device)
         for t in range(first_epochs):
             print(f"Epoch {t+1}\n-------------------------------")
             train_loop(train_dataloader, model, loss, optimizer(
-                model.module.fc.parameters(), lr=lr, momentum=0.9))
-            test_loop(test_dataloader, model, loss)
+                get_parameters(model, model_name), lr=lr, momentum=0.9), device)
+            test_loop(test_dataloader, model, loss, device)
         print("Done!")
 
 
