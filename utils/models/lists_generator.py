@@ -7,8 +7,8 @@ parameters_extracting = {"fc.parameters": ['Resnet50'],
 
 
 def get_models_list():
-    return [('VGG-19', models.vgg19(weights=models.VGG19_Weights.IMAGENET1K_V1)),
-            ('Resnet50', models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V2)),
+    return [('Resnet50', models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V2)),
+            ('VGG-19', models.vgg19(weights=models.VGG19_Weights.IMAGENET1K_V1)),
             ('Mobilenet v2', models.mobilenet_v2(weights=models.MobileNet_V2_Weights.IMAGENET1K_V2)),]
 
 
