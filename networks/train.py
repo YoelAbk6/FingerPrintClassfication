@@ -1,5 +1,5 @@
 import torch
-from utils.models.lists_generator import parameters_extracting
+from utils.models.lists_generator import optimizers_init
 
 
 def train_loop(dataloader, model, loss_fn, optimizer, device):
@@ -37,10 +37,8 @@ def test_loop(dataloader, model, loss_fn, device):
         f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
 
-def get_parameters(model, model_name):
-    if model_name in parameters_extracting["fc.parameters"]:
-        return model.fc.parameters()
-    elif model_name in parameters_extracting["parameters"]:
-        return model.parameters()
-    else:
-        raise Exception(f'{model_name} most be in parameters_extracting dict')
+def init_optimizer(optim, name, model, lr=0.001, momentum=0.9):
+    if name in optimizers_init.get('momentum'):
+        return optim(model.parameters(), lr=lr, momentum=momentum)
+    elif name in optimizers_init.get('no_momentum'):
+        return optim(model.parameters(), lr=lr)
