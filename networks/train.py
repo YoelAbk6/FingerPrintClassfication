@@ -1,5 +1,38 @@
 import torch
+import torch.nn as nn
 from utils.models.lists_generator import optimizers_init
+import torchvision.models as models
+
+
+def init_model(model, model_name, device, num_classes):
+    out_model = None
+    if model_name == 'Resnet50':
+        out_model = model(weights=models.ResNet50_Weights.IMAGENET1K_V2)
+    elif model_name == 'VGG-19':
+        out_model = model(weights=models.VGG19_Weights.IMAGENET1K_V1)
+    elif model_name == 'Mobilenet v2':
+        out_model = model(weights=models.MobileNet_V2_Weights.IMAGENET1K_V2)
+    else:
+        raise Exception(f'Need to init {model_name} in networks.train.init_model() function!\n')
+
+    out_model = nn.DataParallel(out_model)
+
+    if hasattr(out_model.module, 'classifier'):
+        num_features = out_model.module.classifier[-1].in_features
+        out_model.module.classifier[-1] = nn.Linear(num_features, num_classes)
+    else:
+        num_features = out_model.module.fc.in_features
+        out_model.module.fc = nn.Linear(num_features, num_classes)
+
+    out_model.to(device)
+    return out_model
+
+
+def init_optimizer(optim, name, model, lr=0.001, momentum=0.9):
+    if name in optimizers_init.get('momentum'):
+        return optim(model.parameters(), lr=lr, momentum=momentum)
+    elif name in optimizers_init.get('no_momentum'):
+        return optim(model.parameters(), lr=lr)
 
 
 def train_loop(dataloader, model, loss_fn, optimizer, device):
@@ -35,10 +68,3 @@ def test_loop(dataloader, model, loss_fn, device):
     correct /= size
     print(
         f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-
-
-def init_optimizer(optim, name, model, lr=0.001, momentum=0.9):
-    if name in optimizers_init.get('momentum'):
-        return optim(model.parameters(), lr=lr, momentum=momentum)
-    elif name in optimizers_init.get('no_momentum'):
-        return optim(model.parameters(), lr=lr)
