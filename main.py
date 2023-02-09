@@ -44,8 +44,11 @@ def main():
         model.to(device)
         for t in range(first_epochs):
             print(f"Epoch {t+1}\n-------------------------------")
-            train_loop(train_dataloader, model, loss, optimizer(
-                model.parameters(), lr=lr, momentum=0.9), device)
+            train_loop(train_dataloader,
+                       model,
+                       loss,
+                       init_optimizer(optimizer, optimizer_name, model, lr),
+                       device)
             test_loop(test_dataloader, model, loss, device)
         print("Done!")
 

@@ -2,8 +2,8 @@ import torchvision.models as models
 import torch.nn as nn
 import torch.optim as optim
 
-parameters_extracting = {"fc.parameters": ['Resnet50'],
-                         "parameters": ['VGG-19', 'Mobilenet v2'], }
+optimizers_init = {"momentum": ['SGD'],
+                   "no_momentum": ['Adam', 'Adagrad'], }
 
 
 def get_models_list():
@@ -17,7 +17,9 @@ def get_losses_list():
 
 
 def get_optimizers_list():
-    return [('SGD', optim.SGD), ]
+    return [('Adam', optim.Adam),
+            ('SGD', optim.SGD),
+            ('Adagrad', optim.Adagrad)]
 
 
 def get_learning_rates_list():
