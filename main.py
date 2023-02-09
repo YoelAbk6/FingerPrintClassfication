@@ -17,9 +17,9 @@ def main():
         device = torch.device("cuda:0")
 
     # Load data
-    path = 'data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png'
+    # path = 'data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png'
     path = '/home/uoriko/FingerPrintClassfication/data/equal'
-    path = 'D:\\data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png\\equal'
+    # path = 'D:\\data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png\\equal'
     data = CustomImageDataset(path, device)
     train_dataloader, test_dataloader = data.get_train_and_test_data()
 
@@ -42,24 +42,27 @@ def main():
         print(
             f'Start training with - Model: {model_name}, Loss: {loss_name}, Optimizer: {optimizer_name}, Learning Rate: {lr_name}')
         print('=================================================================================================')
-        model = nn.DataParallel(model)
 
-        if hasattr(model.module, 'classifier'):
-            num_features = model.module.classifier[-1].in_features
-            model.module.classifier[-1] = nn.Linear(num_features, num_classes)
-        else:
-            num_features = model.module.fc.in_features
-            model.module.fc = nn.Linear(num_features, num_classes)
+        curr_model = init_model(model, model_name, device, num_classes)
 
-        model.to(device)
+        # model = nn.DataParallel(model)
+
+        # if hasattr(model.module, 'classifier'):
+        #     num_features = model.module.classifier[-1].in_features
+        #     model.module.classifier[-1] = nn.Linear(num_features, num_classes)
+        # else:
+        #     num_features = model.module.fc.in_features
+        #     model.module.fc = nn.Linear(num_features, num_classes)
+
+        # model.to(device)
         for t in range(first_epochs):
             print(f"Epoch {t+1}\n-------------------------------")
             train_loop(train_dataloader,
-                       model,
+                       curr_model,
                        loss,
-                       init_optimizer(optimizer, optimizer_name, model, lr),
+                       init_optimizer(optimizer, optimizer_name, curr_model, lr),
                        device)
-            test_loop(test_dataloader, model, loss, device)
+            test_loop(test_dataloader, curr_model, loss, device)
         print("Done!")
 
 
