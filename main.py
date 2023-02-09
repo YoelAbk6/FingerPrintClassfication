@@ -12,14 +12,12 @@ num_classes = 2
 
 def main():
 
-    device = torch.device("cpu")
-    if torch.cuda.is_available():
-        device = torch.device("cuda:0")
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
     # Load data
     # path = 'data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png'
     path = '/home/uoriko/FingerPrintClassfication/data/equal'
-    # path = 'D:\\data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png\\equal'
+    path = 'D:\\data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png\\equal'
     data = CustomImageDataset(path, device)
     train_dataloader, test_dataloader = data.get_train_and_test_data()
 
@@ -28,7 +26,9 @@ def main():
     losses = get_losses_list()
     optimizers = get_optimizers_list()
     learning_rates = get_learning_rates_list()
-    best_model = None
+    best_model = best_loss = best_optimizer = best_lr = None
+    best_model_state_dict = None
+    best_accuracy = 0
 
     # Try all combinations to find the best one
     for iter in itertools.product(models, losses, optimizers, learning_rates):
@@ -45,25 +45,54 @@ def main():
 
         curr_model = init_model(model, model_name, device, num_classes)
 
-        # model = nn.DataParallel(model)
-
-        # if hasattr(model.module, 'classifier'):
-        #     num_features = model.module.classifier[-1].in_features
-        #     model.module.classifier[-1] = nn.Linear(num_features, num_classes)
-        # else:
-        #     num_features = model.module.fc.in_features
-        #     model.module.fc = nn.Linear(num_features, num_classes)
-
-        # model.to(device)
         for t in range(first_epochs):
             print(f"Epoch {t+1}\n-------------------------------")
             train_loop(train_dataloader,
                        curr_model,
                        loss,
-                       init_optimizer(optimizer, optimizer_name, curr_model, lr),
+                       init_optimizer(optimizer, optimizer_name,
+                                      curr_model, lr),
                        device)
-            test_loop(test_dataloader, curr_model, loss, device)
-        print("Done!")
+            curr_accuracy = test_loop(
+                test_dataloader, curr_model, loss, device)
+            if curr_accuracy > best_accuracy:
+                best_accuracy = curr_accuracy
+                best_model = (model_name, curr_model)
+                best_loss = loss_tuple
+                best_optimizer = optimizer_tuple
+                best_lr = lr_tuple
+
+    print('=================================================================================================')
+    print("Resarch best model is done!")
+    print(
+        f'The best model and hyperparameters are - Model: {best_model[0]} Loss: {best_loss[0]}, Optimizer: {best_optimizer[0]}, Learning Rate: {best_lr[0]}')
+    print('=================================================================================================')
+
+    print('=================================================================================================')
+    print('Starting with full training')
+    print('=================================================================================================')
+    for t in range(full_train_epochs):
+        print(f"Epoch {t+1}\n-------------------------------")
+        train_loop(train_dataloader,
+                   best_model[1],
+                   best_loss[1],
+                   init_optimizer(best_optimizer[1], best_optimizer[0],
+                                  best_model[1], best_lr[1]),
+                   device)
+        curr_accuracy = test_loop(
+            test_dataloader, best_model[1], best_loss[1], device)
+        if curr_accuracy > best_accuracy:
+            best_accuracy = curr_accuracy
+            # best_model_state_dict = best_model[1].state_dict()
+
+    # for param_tensor in best_model_state_dict:
+    #     print(param_tensor, "\t", best_model_state_dict[param_tensor].size())
+
+    print('=================================================================================================')
+    print("Train best model is done!")
+    print(
+        f'Best accuracy reached: {best_accuracy}, model is saved in best_model_state_dict')
+    ('=================================================================================================')
 
 
 if __name__ == '__main__':
