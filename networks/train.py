@@ -13,7 +13,8 @@ def init_model(model, model_name, device, num_classes):
     elif model_name == 'Mobilenet v2':
         out_model = model(weights=models.MobileNet_V2_Weights.IMAGENET1K_V2)
     else:
-        raise Exception(f'Need to init {model_name} in networks.train.init_model() function!\n')
+        raise Exception(
+            f'Need to init {model_name} in networks.train.init_model() function!\n')
 
     out_model = nn.DataParallel(out_model)
 
@@ -68,3 +69,5 @@ def test_loop(dataloader, model, loss_fn, device):
     correct /= size
     print(
         f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+
+    return 100*correct
