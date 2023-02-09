@@ -1,12 +1,13 @@
+import itertools
+from networks.train import *
+from utils.models.lists_generator import *
+from utils.data_loaders.data_loader import CustomImageDataset
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '3,4'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-from utils.data_loaders.data_loader import CustomImageDataset
-from utils.models.lists_generator import *
-from networks.train import *
-import itertools
 first_epochs = 5
 full_train_epochs = 30
+num_classes = 2
 
 
 def main():
@@ -16,8 +17,9 @@ def main():
         device = torch.device("cuda:0")
 
     # Load data
-    # path = 'data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png'
+    path = 'data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png'
     path = '/home/uoriko/FingerPrintClassfication/data/equal'
+    path = 'D:\\data\\NIST302\\images\\auxiliary\\flat\\M\\500\\plain\\png\\equal'
     data = CustomImageDataset(path, device)
     train_dataloader, test_dataloader = data.get_train_and_test_data()
 
@@ -41,6 +43,14 @@ def main():
             f'Start training with - Model: {model_name}, Loss: {loss_name}, Optimizer: {optimizer_name}, Learning Rate: {lr_name}')
         print('=================================================================================================')
         model = nn.DataParallel(model)
+
+        if hasattr(model.module, 'classifier'):
+            num_features = model.module.classifier[-1].in_features
+            model.module.classifier[-1] = nn.Linear(num_features, num_classes)
+        else:
+            num_features = model.module.fc.in_features
+            model.module.fc = nn.Linear(num_features, num_classes)
+
         model.to(device)
         for t in range(first_epochs):
             print(f"Epoch {t+1}\n-------------------------------")
