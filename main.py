@@ -1,13 +1,21 @@
-import itertools
-from networks.train import *
-from utils.models.lists_generator import *
 from utils.data_loaders.data_loader import CustomImageDataset
+from utils.models.lists_generator import *
+from networks.train import *
+from sklearn.metrics import confusion_matrix
+import numpy as np
+import pandas as pd
+import seaborn as sn
+import itertools
+import matplotlib.pyplot as plt
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '3,4'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-first_epochs = 5
+
+
+first_epochs = 1
 full_train_epochs = 30
 num_classes = 2
+classes = ['Female', 'Male']
 
 
 def main():
@@ -29,6 +37,7 @@ def main():
     best_model = best_loss = best_optimizer = best_lr = None
     best_model_state_dict = None
     best_accuracy = 0
+    y_pred, y_real = [], []
 
     # Try all combinations to find the best one
     for iter in itertools.product(models, losses, optimizers, learning_rates):
@@ -79,8 +88,10 @@ def main():
                    init_optimizer(best_optimizer[1], best_optimizer[0],
                                   best_model[1], best_lr[1]),
                    device)
-        curr_accuracy = test_loop(
-            test_dataloader, best_model[1], best_loss[1], device)
+        curr_accuracy, curr_y_pred, curr_y_real = test_loop(
+            test_dataloader, best_model[1], best_loss[1], device, True)
+        y_pred.extend(curr_y_pred)
+        y_real.extend(curr_y_real)
         if curr_accuracy > best_accuracy:
             best_accuracy = curr_accuracy
             # best_model_state_dict = best_model[1].state_dict()
@@ -91,8 +102,14 @@ def main():
     print('=================================================================================================')
     print("Train best model is done!")
     print(
-        f'Best accuracy reached: {best_accuracy}, model is saved in best_model_state_dict')
+        f'Best accuracy reached: {best_accuracy:>0.2f}%, model is saved in best_model_state_dict')
     ('=================================================================================================')
+    cf_matrix = confusion_matrix(y_real, y_pred)
+    df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix, axis=1), index=[i for i in classes],
+                         columns=[i for i in classes])
+    plt.figure(figsize=(12, 7))
+    sn.heatmap(df_cm, annot=True)
+    plt.savefig('Confusion Matrix.png')
 
 
 if __name__ == '__main__':
