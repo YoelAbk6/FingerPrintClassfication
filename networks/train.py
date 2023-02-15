@@ -64,7 +64,7 @@ def test_loop(dataloader, model, loss_fn, device, final_model=False):
             y_true.extend(y.data.numpy())
             y = y.to(device)
             pred = model(X)
-            y_pred.extend(torch.argmax(pred, 1).data.numpy())
+            y_pred.extend(torch.argmax(pred, 1).data.cpu().numpy())
             test_loss += loss_fn(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 

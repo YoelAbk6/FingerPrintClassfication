@@ -14,7 +14,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
 first_epochs = 1
-full_train_epochs = 30
+full_train_epochs = 3
 num_classes = 2
 classes = ['Female', 'Male']
 best_comb = defaultdict(int)
@@ -27,6 +27,8 @@ def main():
     data_sets = get_data_sets_list()
 
     for DS_name, DS_path in data_sets:
+        out_dir = f'./out/{DS_name}'
+        os.makedirs(out_dir, exist_ok=True)
         data = CustomImageDataset(DS_path, device)
         train_dataloader, test_dataloader = data.get_train_and_test_data()
 
@@ -113,7 +115,9 @@ def main():
                              columns=[i for i in classes])
         plt.figure(figsize=(12, 7))
         sn.heatmap(df_cm, annot=True)
-        plt.savefig(f'./out/{DS_name}/Confusion Matrix.png')
+        plt.savefig(f'{out_dir}/Confusion_Matrix.png')
+
+    print("DONE")
 
 
 if __name__ == '__main__':

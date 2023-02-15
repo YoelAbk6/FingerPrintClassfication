@@ -8,8 +8,8 @@ optimizers_init = {"momentum": ['SGD'],
 
 def get_models_list():
     return [('Resnet50', models.resnet50),
-            ('VGG-19', models.vgg19),
-            ('Mobilenet v2', models.mobilenet_v2), ]
+    ('VGG-19', models.vgg19),
+    ('Mobilenet v2', models.mobilenet_v2), ]
 
 
 def get_losses_list():
@@ -27,5 +27,5 @@ def get_learning_rates_list():
 
 
 def get_data_sets_list():
-    return [("NIST302a-M", '/home/uoriko/FingerPrintClassfication/data/equal'),
-            ("SOCOfing", '/home/uoriko/FingerPrintClassfication/data/')]
+    return [("NIST302a-M", 'data/NIST302/auxiliary/flat/M/500/plain/png/equal'),
+            ("SOCOfing", 'data/SOCOFing/Real')]
