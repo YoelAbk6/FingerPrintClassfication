@@ -95,12 +95,12 @@ def main():
         out_dir = f'./out/{DS_name}/research_best_model/{best_model[0]}'
         os.makedirs(out_dir, exist_ok=True)
         save_conf_matrix(
-            f'/{out_dir}/Confusion_Matrix.png', y_real, y_pred)
+            f'{out_dir}/Confusion_Matrix.png', y_real, y_pred)
 
         print('=================================================================================================')
         print(f'Resarch best model is done for {DS_name}!')
         print(
-            f'The best model and hyperparameters for {DS_name} are - Model: {best_model[0]} Loss: {best_loss[0]}, Optimizer: {best_optimizer[0]}, Learning Rate: {best_lr[0]}')
+            f'The best model and hyperparameters for {DS_name} are - Model: {best_model[0]}, Loss: {best_loss[0]}, Optimizer: {best_optimizer[0]}, Learning Rate: {best_lr[0]}')
         print('=================================================================================================')
 
         best_comb_occurences[best_iter] += 1

@@ -10,7 +10,7 @@ def init_model(model, model_name, device, num_classes):
         out_model = model(weights=models.ResNet50_Weights.IMAGENET1K_V2)
     elif model_name == 'VGG-19':
         out_model = model(weights=models.VGG19_Weights.IMAGENET1K_V1)
-    elif model_name == 'Mobilenet v2':
+    elif model_name == 'Mobilenet-v2':
         out_model = model(weights=models.MobileNet_V2_Weights.IMAGENET1K_V2)
     else:
         raise Exception(
