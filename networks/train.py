@@ -53,15 +53,18 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 
-def test_loop(dataloader, model, loss_fn, device):
+def test_loop(dataloader, model, loss_fn, device, final_model=False):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     test_loss, correct = 0, 0
+    y_pred, y_true = [], []
 
     with torch.no_grad():
         for X, y in dataloader:
+            y_true.extend(y.data.numpy())
             y = y.to(device)
             pred = model(X)
+            y_pred.extend(torch.argmax(pred, 1).data.numpy())
             test_loss += loss_fn(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 
@@ -70,4 +73,6 @@ def test_loop(dataloader, model, loss_fn, device):
     print(
         f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
+    if (final_model):
+        return 100*correct, y_pred, y_true
     return 100*correct
