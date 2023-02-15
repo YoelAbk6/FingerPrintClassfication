@@ -24,3 +24,8 @@ def get_optimizers_list():
 
 def get_learning_rates_list():
     return [('0.01', 0.01), ('0.001', 0.001), ('0.0001', 0.0001)]
+
+
+def get_data_sets_list():
+    return [("NIST302a-M", '/home/uoriko/FingerPrintClassfication/data/equal'),
+            ("SOCOfing", '/home/uoriko/FingerPrintClassfication/data/')]
