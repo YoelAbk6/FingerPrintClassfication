@@ -8,8 +8,8 @@ optimizers_init = {"momentum": ['SGD'],
 
 def get_models_list():
     return [('Resnet50', models.resnet50),
-            ('VGG-19', models.vgg19),
-            ('Mobilenet v2', models.mobilenet_v2), ]
+    ('VGG-19', models.vgg19),
+    ('Mobilenet-v2', models.mobilenet_v2), ]
 
 
 def get_losses_list():
@@ -24,3 +24,8 @@ def get_optimizers_list():
 
 def get_learning_rates_list():
     return [('0.01', 0.01), ('0.001', 0.001), ('0.0001', 0.0001)]
+
+
+def get_data_sets_list():
+    return [("NIST302a-M", 'data/NIST302/auxiliary/flat/M/500/plain/png/equal'),
+            ("SOCOfing", 'data/SOCOFing/Real')]

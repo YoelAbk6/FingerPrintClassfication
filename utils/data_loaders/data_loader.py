@@ -35,8 +35,7 @@ class CustomImageDataset(Dataset):
         return image.to(self.device), label
 
     def get_label_from_filename(self, image_name):
-        file_name = image_name.replace('.png', '')
-        return 1 if file_name.split('_')[-2] == 'M' else 0
+        return 1 if image_name.split('_')[-2] == 'M' else 0
 
     def get_train_and_test_data(self):
         train_size = int(0.8 * self.__len__())

@@ -10,7 +10,7 @@ def init_model(model, model_name, device, num_classes):
         out_model = model(weights=models.ResNet50_Weights.IMAGENET1K_V2)
     elif model_name == 'VGG-19':
         out_model = model(weights=models.VGG19_Weights.IMAGENET1K_V1)
-    elif model_name == 'Mobilenet v2':
+    elif model_name == 'Mobilenet-v2':
         out_model = model(weights=models.MobileNet_V2_Weights.IMAGENET1K_V2)
     else:
         raise Exception(
@@ -53,7 +53,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 
-def test_loop(dataloader, model, loss_fn, device, final_model=False):
+def test_loop(dataloader, model, loss_fn, device):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     test_loss, correct = 0, 0
@@ -64,7 +64,7 @@ def test_loop(dataloader, model, loss_fn, device, final_model=False):
             y_true.extend(y.data.numpy())
             y = y.to(device)
             pred = model(X)
-            y_pred.extend(torch.argmax(pred, 1).data.numpy())
+            y_pred.extend(torch.argmax(pred, 1).data.cpu().numpy())
             test_loss += loss_fn(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 
@@ -73,6 +73,4 @@ def test_loop(dataloader, model, loss_fn, device, final_model=False):
     print(
         f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
-    if (final_model):
-        return 100*correct, y_pred, y_true
-    return 100*correct
+    return 100*correct, y_pred, y_true
