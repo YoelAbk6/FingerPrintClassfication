@@ -43,7 +43,8 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
     for batch, (X, y) in enumerate(dataloader):
         # Compute prediction and loss
         pred = model(X)
-        loss = loss_fn(pred, y.to(device))
+        y = y.to(device)
+        loss = loss_fn(pred, y)
         correct += (pred.argmax(1) == y).type(torch.float).sum().item()
         train_loss += loss.item()
 
