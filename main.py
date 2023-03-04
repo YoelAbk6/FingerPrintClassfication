@@ -66,7 +66,8 @@ def main():
         best_model_state_dict = {}
         best_accuracy = 0
         best_iter = None
-        y_pred, y_real = [], []
+        best_y_pred, best_y_real = [], []
+        best_accuracy_list_train, best_loss_list_train, best_accuracy_list_test, best_loss_list_test = [], [], [], []
 
         # Try all combinations to find the best one
         for iter in itertools.product(models, losses, optimizers, learning_rates):
@@ -77,7 +78,7 @@ def main():
             optimizer_name, optimizer = optimizer_tuple
             lr_name, lr = lr_tuple
             y_pred, y_real = [], []
-            accuracy_list_train, loss_list_train, accuracy_list_test, loss_list_test = [], [], [], []
+            curr_accuracy_list_train, curr_loss_list_train, curr_accuracy_list_test, curr_loss_list_test = [], [], [], []
             print('=================================================================================================')
             print(
                 f'Running with Model: {model_name}, Loss: {loss_name}, Optimizer: {optimizer_name}, Learning Rate: {lr_name}')
@@ -93,30 +94,38 @@ def main():
                                                         init_optimizer(optimizer, optimizer_name,
                                                                        curr_model, lr),
                                                         device)
-                accuracy_list_train.append(accuracy_train)
-                loss_list_train.append(loss_train)
+                curr_accuracy_list_train.append(accuracy_train)
+                curr_loss_list_train.append(loss_train)
                 curr_accuracy, curr_y_pred, curr_y_real, loss_test = test_loop(
                     test_dataloader, curr_model, loss, device)
                 accuracy_list_test.append(curr_accuracy)
                 loss_list_test.append(loss_test)
                 y_pred.extend(curr_y_pred)
                 y_real.extend(curr_y_real)
-                if curr_accuracy > best_accuracy:
-                    best_accuracy = curr_accuracy
-                    best_model = (model_name, curr_model)
-                    best_loss = loss_tuple
-                    best_optimizer = optimizer_tuple
-                    best_lr = lr_tuple
-                    best_iter = iter
+
+            if len(best_accuracy_list_test) == 0 or max(curr_accuracy_list_test) > max(best_accuracy_list_test):
+                best_accuracy_list_test = curr_accuracy_list_test
+                best_accuracy_list_train = curr_accuracy_list_train
+                best_loss_list_test = curr_loss_list_test
+                best_loss_list_train = curr_loss_list_train
+                best_y_pred = y_pred
+                best_y_real = y_real
+
+                best_accuracy = max(curr_accuracy_list_test)
+                best_model = (model_name, curr_model)
+                best_loss = loss_tuple
+                best_optimizer = optimizer_tuple
+                best_lr = lr_tuple
+                best_iter = iter
 
         out_dir = f'./out/{DS_name}/research_best_model/{best_model[0]}'
         os.makedirs(out_dir, exist_ok=True)
         save_conf_matrix(
-            f'{out_dir}/Confusion_Matrix.png', y_real, y_pred)
+            f'{out_dir}/Confusion_Matrix.png', best_y_real, best_y_pred)
 
-        save_performance_graph(accuracy_list_train, accuracy_list_test,
+        save_performance_graph(best_accuracy_list_train, best_accuracy_list_test,
                                first_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
-        save_performance_graph(loss_list_train, loss_list_test, first_epochs,
+        save_performance_graph(best_loss_list_train, best_loss_list_test, first_epochs,
                                "Loss", f'{out_dir}/Loss_graph.png')
         print('=================================================================================================')
         print(f'Resarch best model is done for {DS_name}!')
@@ -155,6 +164,8 @@ def main():
         train_dataloader, test_dataloader = data.get_train_and_test_data()
         curr_model = init_model(model, model_name, device, num_classes)
         accuracy_list_train, loss_list_train, accuracy_list_test, loss_list_test = [], [], [], []
+        y_pred, y_real = [], []
+        best_accuracy = 0
         for t in range(full_train_epochs):
             print(f"Epoch {t+1}\n-------------------------------")
             accuracy_train, loss_train = train_loop(train_dataloader,
