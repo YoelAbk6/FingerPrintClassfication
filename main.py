@@ -3,6 +3,7 @@ from utils.data_loaders.data_loader import CustomImageDataset
 from utils.models.lists_generator import *
 from utils.output_generator import *
 from networks.train import *
+from evaluate import *
 import itertools
 import os
 
@@ -88,14 +89,10 @@ def main():
                 best_y_real = y_real_list
 
                 best_accuracy = max(curr_accuracy_list_test)
-                best_model = (model_name, curr_model)
-                best_loss = loss_tuple
-                best_optimizer = optimizer_tuple
-                best_lr = lr_tuple
                 best_iter = iter
 
         # Handle outputs research
-        out_dir = f'./out/{DS_name}/research_best_model/{best_model[0]}'
+        out_dir = f'./out/{DS_name}/research_best_model/{best_iter[0][0]}'
         os.makedirs(out_dir, exist_ok=True)
         save_conf_matrix(
             f'{out_dir}/Confusion_Matrix.png', best_y_real, best_y_pred)
@@ -107,7 +104,7 @@ def main():
         print('=================================================================================================')
         print(f'Resarch best model is done for {DS_name}!')
         print(
-            f'The best model and hyperparameters for {DS_name} are - Model: {best_model[0]}, Loss: {best_loss[0]}, Optimizer: {best_optimizer[0]}, Learning Rate: {best_lr[0]}')
+            f'The best model and hyperparameters for {DS_name} are - Model: {best_iter[0][0]}, Loss: {best_iter[1][0]}, Optimizer: {best_iter[2][0]}, Learning Rate: {best_iter[3][0]}')
         print('=================================================================================================')
 
         best_comb_occurences[best_iter] += 1
@@ -126,6 +123,10 @@ def main():
             best_comb_iter = iter
 
     model_tuple, loss_tuple, optimizer_tuple, lr_tuple = best_comb_iter
+    model_name, model = model_tuple
+    loss_name, loss = loss_tuple
+    optimizer_name, optimizer = optimizer_tuple
+    lr_name, lr = lr_tuple
     print('=================================================================================================')
     print(
         f'The best model and hyperparameters acorss all datasets are Model: {model_tuple[0]}, Loss: {loss_tuple[0]}, Optimizer: {optimizer_tuple[0]}, Learning Rate: {lr_tuple[0]}')
@@ -143,20 +144,22 @@ def main():
         accuracy_list_train, loss_list_train, accuracy_list_test, loss_list_test = [], [], [], []
         y_pred_list, y_real_list = [], []
         best_accuracy = 0
+
+        curr_model = init_model(model, model_name, device, num_classes)
         # Train and test loop
         for t in range(full_train_epochs):
             print(f"Epoch {t+1}\n-------------------------------")
             curr_optim = init_optimizer(
-                best_optimizer[1], best_optimizer[0], best_model[1], best_lr[1])
+                optimizer, optimizer_name, curr_model, lr)
             accuracy_train, loss_train = train_loop(train_dataloader,
-                                                    best_model[1],
-                                                    best_loss[1],
+                                                    curr_model,
+                                                    loss,
                                                     curr_optim,
                                                     device)
             accuracy_list_train.append(accuracy_train)
             loss_list_train.append(loss_train)
             curr_accuracy, curr_y_pred, curr_y_real, loss_test = test_loop(
-                test_dataloader, best_model[1], best_loss[1], device)
+                test_dataloader, curr_model, loss, device)
             accuracy_list_test.append(curr_accuracy)
             loss_list_test.append(loss_test)
             y_pred_list.extend(curr_y_pred)
@@ -165,7 +168,7 @@ def main():
                 best_accuracy = curr_accuracy
 
         # Handle outputs best model
-        out_dir = f'./out/{DS_name}/best_model_performance/{best_model[0]}/'
+        out_dir = f'./out/{DS_name}/best_model_performance/{model_name}/'
         os.makedirs(out_dir, exist_ok=True)
         save_conf_matrix(
             f'{out_dir}/Confusion_Matrix.png', y_real_list, y_pred_list)
@@ -174,6 +177,8 @@ def main():
                                full_train_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
         save_performance_graph(loss_list_train, loss_list_test, full_train_epochs,
                                "Loss", f'{out_dir}/Loss_graph.png')
+        # Save model
+        torch.save(curr_model.state_dict(), f'{out_dir}/my_model.pt')
         print('=================================================================================================')
         print(
             f'Train best model on {DS_name} is done, best accuracy reached: {best_accuracy:>0.2f}%, model is saved in best_model_state_dict')
@@ -182,5 +187,17 @@ def main():
     print("The run is done")
 
 
+def evaluate():
+    data_sets = get_data_sets_list()
+    for DS_name, DS_path in data_sets:
+        for root, dirs, files in os.walk("./out"):
+            for file in files:
+                if file.endswith('.pt'):
+                    model = load_model(os.path.join(root, file))
+                    if model is not None:
+                        predict(model, DS_path)
+
+
 if __name__ == '__main__':
-    main()
+    # main()
+    evaluate()
