@@ -155,14 +155,13 @@ def main():
     print('=================================================================================================')
 
     print('=================================================================================================')
-    print('Starting full training on each dataset with the best model')
+    print(f'Starting full training on each dataset with {model_tuple[0]}')
     print('=================================================================================================')
 
     for DS_name, DS_path in data_sets:
 
         data = CustomImageDataset(DS_path, device)
         train_dataloader, test_dataloader = data.get_train_and_test_data()
-        curr_model = init_model(model, model_name, device, num_classes)
         accuracy_list_train, loss_list_train, accuracy_list_test, loss_list_test = [], [], [], []
         y_pred, y_real = [], []
         best_accuracy = 0
@@ -185,7 +184,7 @@ def main():
 
         # best_model_state_dict.append({DS_name, best_model[1].state_dict()})
 
-        out_dir = f'./out/{DS_name}/best_model_performance/'
+        out_dir = f'./out/{DS_name}/best_model_performance/{best_model[0]}/'
         os.makedirs(out_dir, exist_ok=True)
         save_conf_matrix(
             f'{out_dir}/Confusion_Matrix.png', y_real, y_pred)
