@@ -9,11 +9,11 @@ import seaborn as sn
 import itertools
 import matplotlib.pyplot as plt
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '3,4'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
-first_epochs = 1
+first_epochs = 3
 full_train_epochs = 3
 num_classes = 2
 classes = ['Female', 'Male']
@@ -22,7 +22,7 @@ best_comb_percentage = defaultdict(float)
 
 
 def save_conf_matrix(path, y_real, y_pred):
-    cf_matrix = confusion_matrix(y_real, y_pred)
+    cf_matrix = confusion_matrix(y_real, y_pred, normalize=True)
     df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix, axis=1), index=[i for i in classes],
                          columns=[i for i in classes])
     plt.figure(figsize=(12, 7))
@@ -98,8 +98,8 @@ def main():
                 curr_loss_list_train.append(loss_train)
                 curr_accuracy, curr_y_pred, curr_y_real, loss_test = test_loop(
                     test_dataloader, curr_model, loss, device)
-                accuracy_list_test.append(curr_accuracy)
-                loss_list_test.append(loss_test)
+                curr_accuracy_list_test.append(curr_accuracy)
+                curr_loss_list_test.append(loss_test)
                 y_pred.extend(curr_y_pred)
                 y_real.extend(curr_y_real)
 
@@ -173,6 +173,8 @@ def main():
                                                     init_optimizer(best_optimizer[1], best_optimizer[0],
                                                                    best_model[1], best_lr[1]),
                                                     device)
+            accuracy_list_train.append(accuracy_train)
+            loss_list_train.append(loss_train)
             curr_accuracy, curr_y_pred, curr_y_real, loss_test = test_loop(
                 test_dataloader, best_model[1], best_loss[1], device)
             accuracy_list_test.append(curr_accuracy)
@@ -190,12 +192,12 @@ def main():
             f'{out_dir}/Confusion_Matrix.png', y_real, y_pred)
 
         save_performance_graph(accuracy_list_train, accuracy_list_test,
-                               first_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
-        save_performance_graph(loss_list_train, loss_list_test, first_epochs,
+                               full_train_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
+        save_performance_graph(loss_list_train, loss_list_test, full_train_epochs,
                                "Loss", f'{out_dir}/Loss_graph.png')
         print('=================================================================================================')
         print(
-            f'Train best model on {DS_name} is done, Best accuracy reached: {best_accuracy:>0.2f}%, model is saved in best_model_state_dict')
+            f'Train best model on {DS_name} is done, best accuracy reached: {best_accuracy:>0.2f}%, model is saved in best_model_state_dict')
         print('=================================================================================================')
 
     print("The run is done")
