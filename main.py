@@ -64,7 +64,8 @@ def main():
             # Train and test loop
             for t in range(search_best_model_epochs):
                 print(f"Epoch {t+1}\n-------------------------------")
-                curr_optim = init_optimizer(optimizer, optimizer_name, curr_model, lr)
+                curr_optim = init_optimizer(
+                    optimizer, optimizer_name, curr_model, lr)
                 accuracy_train, loss_train = train_loop(train_dataloader,
                                                         curr_model,
                                                         loss,
@@ -199,5 +200,5 @@ def evaluate():
 
 
 if __name__ == '__main__':
-    # main()
-    evaluate()
+    main()
+    # evaluate()

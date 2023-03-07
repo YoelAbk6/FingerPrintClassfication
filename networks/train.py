@@ -7,23 +7,33 @@ import torchvision.models as models
 def init_model(model, model_name, device, num_classes):
     out_model = None
     if model_name == 'Resnet50':
-        out_model = model(weights=models.ResNet50_Weights.IMAGENET1K_V2)
+        out_model = model(
+            weights=models.ResNet50_Weights.IMAGENET1K_V2).to(device)
     elif model_name == 'VGG-19':
-        out_model = model(weights=models.VGG19_Weights.IMAGENET1K_V1)
+        out_model = model(
+            weights=models.VGG19_Weights.IMAGENET1K_V1).to(device)
     elif model_name == 'Mobilenet-v2':
-        out_model = model(weights=models.MobileNet_V2_Weights.IMAGENET1K_V2)
+        out_model = model(
+            weights=models.MobileNet_V2_Weights.IMAGENET1K_V2).to(device)
     else:
         raise Exception(
             f'Need to init {model_name} in networks.train.init_model() function!\n')
 
     out_model = nn.DataParallel(out_model)
 
+    for param in out_model.parameters():
+        param.requires_grad = False
+
     if hasattr(out_model.module, 'classifier'):
         num_features = out_model.module.classifier[-1].in_features
         out_model.module.classifier[-1] = nn.Linear(num_features, num_classes)
     else:
-        num_features = out_model.module.fc.in_features
-        out_model.module.fc = nn.Linear(num_features, num_classes)
+        out_model.module.fc = nn.Sequential(
+            nn.Linear(2048, 128),
+            nn.ReLU(inplace=True),
+            nn.Linear(128, 2)).to(device)
+        # num_features = out_model.module.fc.in_features
+        # out_model.module.fc = nn.Linear(num_features, num_classes)
 
     out_model.to(device)
     return out_model
