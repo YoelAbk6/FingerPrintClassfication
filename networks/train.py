@@ -26,7 +26,10 @@ def init_model(model, model_name, device, num_classes):
 
     if hasattr(out_model.module, 'classifier'):
         num_features = out_model.module.classifier[-1].in_features
-        out_model.module.classifier[-1] = nn.Linear(num_features, num_classes)
+        out_model.module.classifier[-1] = nn.Sequential(
+            nn.Linear(num_features, 128),
+            nn.ReLU(inplace=True),
+            nn.Linear(128, 2)).to(device)
     else:
         out_model.module.fc = nn.Sequential(
             nn.Linear(2048, 128),
