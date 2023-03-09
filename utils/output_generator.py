@@ -1,11 +1,19 @@
 from sklearn.metrics import confusion_matrix
+import torch 
 import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 classes = ['Female', 'Male']
 
+def save_test_data(dataloader, out_dir):
+    f =  open(os.path.join(out_dir, "testList.txt"), "w")
+    with torch.no_grad():
+        for X, y, paths in dataloader:
+            for path in paths:
+                f.write(path+ '\n')
 
 def save_conf_matrix(path, y_real, y_pred):
     cf_matrix = confusion_matrix(y_real, y_pred, normalize='true')

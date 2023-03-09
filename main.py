@@ -7,15 +7,15 @@ from evaluate import *
 import itertools
 import os
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+os.environ['CUDA_VISIBLE_DEVICES'] = '3,4'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 def main():
 
-    search_best_model_epochs = 3
-    full_train_epochs = 3
+    search_best_model_epochs = 7
+    full_train_epochs = 50
     num_classes = 2
     best_comb_occurences = defaultdict(int)
     best_comb_percentage = defaultdict(float)
@@ -180,6 +180,7 @@ def main():
                                "Loss", f'{out_dir}/Loss_graph.png')
         # Save model
         torch.save(curr_model.state_dict(), f'{out_dir}/my_model.pt')
+        save_test_data(test_dataloader, out_dir)
         print('=================================================================================================')
         print(
             f'Train best model on {DS_name} is done, best accuracy reached: {best_accuracy:>0.2f}%, model is saved in best_model_state_dict')
@@ -189,16 +190,15 @@ def main():
 
 
 def evaluate():
-    data_sets = get_data_sets_list()
-    for DS_name, DS_path in data_sets:
-        for root, dirs, files in os.walk("./out"):
-            for file in files:
-                if file.endswith('.pt'):
-                    model = load_model(os.path.join(root, file))
-                    if model is not None:
-                        predict(model, DS_path)
 
+    for root, dirs, files in os.walk("./out/NIST302a-M"):
+        for file in files:
+            if file.endswith('.pt'):
+                model = load_model(os.path.join(root, file))
+                model.eval()
+                if model is not None:
+                    predict(model, './out/NIST302a-M/best_model_performance/VGG-19/testList.txt')
 
 if __name__ == '__main__':
-    main()
-    # evaluate()
+    # main()
+    evaluate()

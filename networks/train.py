@@ -21,8 +21,6 @@ def init_model(model, model_name, device, num_classes):
 
     out_model = nn.DataParallel(out_model)
 
-    for param in out_model.parameters():
-        param.requires_grad = False
 
     if hasattr(out_model.module, 'classifier'):
         num_features = out_model.module.classifier[-1].in_features
@@ -53,13 +51,15 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     correct, train_loss = 0, 0
-    for batch, (X, y) in enumerate(dataloader):
+    for batch, (X, y, paths) in enumerate(dataloader):
         # Compute prediction and loss
         pred = model(X)
         y = y.to(device)
         loss = loss_fn(pred, y)
         correct += (pred.argmax(1) == y).type(torch.float).sum().item()
         train_loss += loss.item()
+
+
 
         # Backpropagation
         optimizer.zero_grad()
@@ -82,7 +82,7 @@ def test_loop(dataloader, model, loss_fn, device):
     y_pred, y_true = [], []
 
     with torch.no_grad():
-        for X, y in dataloader:
+        for X, y, paths in dataloader:
             y_true.extend(y.data.numpy())
             y = y.to(device)
             pred = model(X)
