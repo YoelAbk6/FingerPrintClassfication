@@ -10,6 +10,8 @@ from utils.data_loaders.data_loader import CustomImageDataset
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 M = 'M'
 F = 'F'
+num_classes = 2
+
 
 def load_model(model_path):
     models = get_models_list()
@@ -20,6 +22,7 @@ def load_model(model_path):
             inited_model.load_state_dict(torch.load(model_path))
             return inited_model
     return None
+
 
 def show_side_by_side(images: list, ncols: int = 6) -> None:
     f, axes = plt.subplots(
@@ -36,9 +39,10 @@ def show_side_by_side(images: list, ncols: int = 6) -> None:
     plt.tight_layout()
     plt.show()
 
+
 def predict(model, DS_path):
 
-    data = CustomImageDataset(DS_path, device, use_file=True)
+    data = CustomImageDataset(DS_path, device, num_classes, use_file=True)
     test_dataloader = data.get_data()
 
     with torch.no_grad():
@@ -49,5 +53,6 @@ def predict(model, DS_path):
             for path, label, predicted in zip(paths, y, pred.argmax(1) == y):
                 if len(imgs) < 16:
                     title = f'{M if label == 1 else F} - {str(predicted.item())}'
-                    imgs.append((np.array(Image.open(path).convert('RGB')), title))
+                    imgs.append(
+                        (np.array(Image.open(path).convert('RGB')), title))
             show_side_by_side(imgs)
