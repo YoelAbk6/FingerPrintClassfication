@@ -28,7 +28,7 @@ def main():
         print(f'Starting resarch best model for {DS_name}')
         print('=================================================================================================')
 
-        data = CustomImageDataset(DS_path, device)
+        data = CustomImageDataset(DS_path, device, num_classes)
         train_dataloader, test_dataloader = data.get_train_and_test_data()
 
         # Generate lists
@@ -140,7 +140,7 @@ def main():
     # Loop through all datasets best model
     for DS_name, DS_path in data_sets:
 
-        data = CustomImageDataset(DS_path, device)
+        data = CustomImageDataset(DS_path, device, num_classes)
         train_dataloader, test_dataloader = data.get_train_and_test_data()
         accuracy_list_train, loss_list_train, accuracy_list_test, loss_list_test = [], [], [], []
         y_pred_list, y_real_list = [], []
@@ -197,8 +197,10 @@ def evaluate():
                 model = load_model(os.path.join(root, file))
                 model.eval()
                 if model is not None:
-                    predict(model, './out/NIST302a-M/best_model_performance/VGG-19/testList.txt')
+                    predict(
+                        model, './out/NIST302a-M/best_model_performance/VGG-19/testList.txt')
+
 
 if __name__ == '__main__':
-    # main()
-    evaluate()
+    main()
+    # evaluate()

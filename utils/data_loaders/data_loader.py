@@ -2,14 +2,17 @@ import os
 import torch
 from torchvision.io import read_image
 from torch.utils.data import Dataset
+from torch.utils.data import WeightedRandomSampler
 from PIL import Image
 from torchvision import transforms
 from torchvision.transforms import ToTensor
 import numpy as np
 
+BATCH_SIZE = 32
+
 
 class CustomImageDataset(Dataset):
-    def __init__(self, image_source, device, use_file=False):
+    def __init__(self, image_source, device, num_classes, use_file=False):
         self.transform = transforms.Compose([
             transforms.ToPILImage(),
             transforms.Resize(size=(224, 224)),
@@ -19,6 +22,7 @@ class CustomImageDataset(Dataset):
 
         self.device = device
         self.use_file = use_file
+        self.classes = num_classes
 
         if self.use_file:
             self.image_paths = []
@@ -26,7 +30,8 @@ class CustomImageDataset(Dataset):
                 for line in f:
                     self.image_paths.append(line.strip())
         else:
-            self.image_paths = [os.path.join(image_source, filename) for filename in os.listdir(image_source)]
+            self.image_paths = [os.path.join(
+                image_source, filename) for filename in os.listdir(image_source)]
 
     def __len__(self):
         return len(self.image_paths)
@@ -49,11 +54,21 @@ class CustomImageDataset(Dataset):
         train_dataset, test_dataset = torch.utils.data.random_split(
             self, [train_size, test_size])
 
-        train_dataset = train_dataset
+        # Get the class distribution of the train dataset
+        class_distribution = [0] * self.classes
+        for _, label, _ in train_dataset:
+            class_distribution[label] += 1
+
+        # Compute the weight of each sample in the train dataset
+        weights = [1.0 / class_distribution[label]
+                   for _, label, _ in train_dataset]
+
+        # Create a sampler using the computed weights
+        sampler = WeightedRandomSampler(weights, len(weights))
+
         return torch.utils.data.DataLoader(
-            train_dataset, batch_size=32, shuffle=True), torch.utils.data.DataLoader(
-            test_dataset, batch_size=32, shuffle=True)
+            train_dataset, batch_size=BATCH_SIZE, sampler=sampler), torch.utils.data.DataLoader(
+            test_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     def get_data(self):
-        return torch.utils.data.DataLoader(self, batch_size=32, shuffle=True)
-    
+        return torch.utils.data.DataLoader(self, batch_size=BATCH_SIZE, shuffle=True)
