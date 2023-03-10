@@ -7,23 +7,34 @@ import torchvision.models as models
 def init_model(model, model_name, device, num_classes):
     out_model = None
     if model_name == 'Resnet50':
-        out_model = model(weights=models.ResNet50_Weights.IMAGENET1K_V2)
+        out_model = model(
+            weights=models.ResNet50_Weights.IMAGENET1K_V2).to(device)
     elif model_name == 'VGG-19':
-        out_model = model(weights=models.VGG19_Weights.IMAGENET1K_V1)
+        out_model = model(
+            weights=models.VGG19_Weights.IMAGENET1K_V1).to(device)
     elif model_name == 'Mobilenet-v2':
-        out_model = model(weights=models.MobileNet_V2_Weights.IMAGENET1K_V2)
+        out_model = model(
+            weights=models.MobileNet_V2_Weights.IMAGENET1K_V2).to(device)
     else:
         raise Exception(
             f'Need to init {model_name} in networks.train.init_model() function!\n')
 
     out_model = nn.DataParallel(out_model)
 
+
     if hasattr(out_model.module, 'classifier'):
         num_features = out_model.module.classifier[-1].in_features
-        out_model.module.classifier[-1] = nn.Linear(num_features, num_classes)
+        out_model.module.classifier[-1] = nn.Sequential(
+            nn.Linear(num_features, 128),
+            nn.ReLU(inplace=True),
+            nn.Linear(128, 2)).to(device)
     else:
-        num_features = out_model.module.fc.in_features
-        out_model.module.fc = nn.Linear(num_features, num_classes)
+        out_model.module.fc = nn.Sequential(
+            nn.Linear(2048, 128),
+            nn.ReLU(inplace=True),
+            nn.Linear(128, 2)).to(device)
+        # num_features = out_model.module.fc.in_features
+        # out_model.module.fc = nn.Linear(num_features, num_classes)
 
     out_model.to(device)
     return out_model
@@ -38,10 +49,17 @@ def init_optimizer(optim, name, model, lr=0.001, momentum=0.9):
 
 def train_loop(dataloader, model, loss_fn, optimizer, device):
     size = len(dataloader.dataset)
-    for batch, (X, y) in enumerate(dataloader):
+    num_batches = len(dataloader)
+    correct, train_loss = 0, 0
+    for batch, (X, y, paths) in enumerate(dataloader):
         # Compute prediction and loss
         pred = model(X)
-        loss = loss_fn(pred, y.to(device))
+        y = y.to(device)
+        loss = loss_fn(pred, y)
+        correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+        train_loss += loss.item()
+
+
 
         # Backpropagation
         optimizer.zero_grad()
@@ -52,6 +70,10 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
             loss, current = loss.item(), batch * len(X)
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
+    correct /= size
+    train_loss /= num_batches
+    return 100 * correct, train_loss
+
 
 def test_loop(dataloader, model, loss_fn, device):
     size = len(dataloader.dataset)
@@ -60,7 +82,7 @@ def test_loop(dataloader, model, loss_fn, device):
     y_pred, y_true = [], []
 
     with torch.no_grad():
-        for X, y in dataloader:
+        for X, y, paths in dataloader:
             y_true.extend(y.data.numpy())
             y = y.to(device)
             pred = model(X)
@@ -73,4 +95,4 @@ def test_loop(dataloader, model, loss_fn, device):
     print(
         f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
-    return 100*correct, y_pred, y_true
+    return 100 * correct, y_pred, y_true, test_loss
