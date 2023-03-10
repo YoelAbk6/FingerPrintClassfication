@@ -7,15 +7,15 @@ from evaluate import *
 import itertools
 import os
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '3,4'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 def main():
 
-    search_best_model_epochs = 7
-    full_train_epochs = 50
+    search_best_model_epochs = 1
+    full_train_epochs = 5
     num_classes = 2
     best_comb_occurences = defaultdict(int)
     best_comb_percentage = defaultdict(float)
@@ -191,16 +191,16 @@ def main():
 
 def evaluate():
 
-    for root, dirs, files in os.walk("./out/NIST302a-M"):
+    for root, dirs, files in os.walk("./out/NIST4"):
         for file in files:
             if file.endswith('.pt'):
                 model = load_model(os.path.join(root, file))
                 model.eval()
                 if model is not None:
                     predict(
-                        model, './out/NIST302a-M/best_model_performance/VGG-19/testList.txt')
+                        model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
 
 
 if __name__ == '__main__':
-    main()
-    # evaluate()
+    # main()
+    evaluate()
