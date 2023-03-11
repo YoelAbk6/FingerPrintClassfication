@@ -8,8 +8,9 @@ optimizers_init = {"momentum": ['SGD'],
 
 def get_models_list():
     return [('Resnet50', models.resnet50),
-    ('VGG-19', models.vgg19),
-    ('Mobilenet-v2', models.mobilenet_v2), ]
+            ('Resnet101', models.resnet101),
+            ('VGG-19', models.vgg19),
+            ('Mobilenet-v2', models.mobilenet_v2), ]
 
 
 def get_losses_list():

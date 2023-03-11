@@ -15,12 +15,14 @@ def init_model(model, model_name, device, num_classes):
     elif model_name == 'Mobilenet-v2':
         out_model = model(
             weights=models.MobileNet_V2_Weights.IMAGENET1K_V2).to(device)
+    elif model_name == 'Resnet101':
+        out_model = model(
+            weights=models.ResNet101_Weights.IMAGENET1K_V2).to(device)
     else:
         raise Exception(
             f'Need to init {model_name} in networks.train.init_model() function!\n')
 
     out_model = nn.DataParallel(out_model)
-
 
     if hasattr(out_model.module, 'classifier'):
         num_features = out_model.module.classifier[-1].in_features
@@ -58,8 +60,6 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         loss = loss_fn(pred, y)
         correct += (pred.argmax(1) == y).type(torch.float).sum().item()
         train_loss += loss.item()
-
-
 
         # Backpropagation
         optimizer.zero_grad()
