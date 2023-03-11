@@ -1,6 +1,7 @@
 import torchvision.models as models
 import torch.nn as nn
 import torch.optim as optim
+from networks.ViT import ViT
 
 optimizers_init = {"momentum": ['SGD'],
                    "no_momentum": ['Adam', 'Adagrad'], }
@@ -10,7 +11,8 @@ def get_models_list():
     return [('Resnet50', models.resnet50),
             ('Resnet101', models.resnet101),
             ('VGG-19', models.vgg19),
-            ('Mobilenet-v2', models.mobilenet_v2), ]
+            ('Mobilenet-v2', models.mobilenet_v2),
+            ('ViT', ViT)]
 
 
 def get_losses_list():

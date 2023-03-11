@@ -18,6 +18,8 @@ def init_model(model, model_name, device, num_classes):
     elif model_name == 'Resnet101':
         out_model = model(
             weights=models.ResNet101_Weights.IMAGENET1K_V2).to(device)
+    elif model_name == 'ViT':
+        out_model = model().to(device)
     else:
         raise Exception(
             f'Need to init {model_name} in networks.train.init_model() function!\n')
