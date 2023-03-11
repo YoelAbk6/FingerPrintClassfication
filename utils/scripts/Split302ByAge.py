@@ -1,34 +1,45 @@
 import os
-import glob
 import shutil
 
-folder_path = ""
+# define the source and destination paths
+src_path = 'data/NIST302/auxiliary/flat/M/500/plain/png/regular'
+dst_path_2_split = 'data/NIST302/auxiliary/flat/M/500/plain/png/age-2-split'
+dst_path_4_split = 'data/NIST302/auxiliary/flat/M/500/plain/png/age-4-split'
 
-# Create the output directories if they don't already exist
-age_group_dirs = ["18to38", "38to58"]
-age_dirs = ["18to28", "28to38", "38to48", "48to58"]
-for age_group_dir in age_group_dirs:
-    os.makedirs(os.path.join(folder_path, age_group_dir), exist_ok=True)
-    for age_dir in age_dirs:
-        os.makedirs(os.path.join(folder_path, age_dir), exist_ok=True)
+# define the age ranges
+age_ranges_2_split = {
+    '18to38': (18, 38),
+    '38to58': (38, 58)
+}
 
-# Copy the images to the appropriate folders
-for filename in glob.glob(os.path.join(folder_path, "*.png")):
-    name, ext = os.path.splitext(os.path.basename(filename))
-    age = int(name.split("_")[-1])
+age_ranges_4_split = {
+    '18to28': (18, 28),
+    '28to38': (28, 38),
+    '38to48': (38, 48),
+    '48to58': (48, 58)
+}
 
-    # Copy to age group directories
-    if 18 <= age < 38:
-        shutil.copy2(filename, os.path.join(folder_path, "18to38"))
-    elif 38 <= age <= 58:
-        shutil.copy2(filename, os.path.join(folder_path, "38to58"))
+# create the destination folders
+for dst_dir in [dst_path_2_split, dst_path_4_split]:
+    if not os.path.exists(dst_dir):
+        os.makedirs(dst_dir)
 
-    # Copy to age directories
-    if 18 <= age <= 28:
-        shutil.copy2(filename, os.path.join(folder_path, "18to28"))
-    elif 28 < age <= 38:
-        shutil.copy2(filename, os.path.join(folder_path, "28to38"))
-    elif 38 < age <= 48:
-        shutil.copy2(filename, os.path.join(folder_path, "38to48"))
-    elif 48 < age <= 58:
-        shutil.copy2(filename, os.path.join(folder_path, "48to58"))
+# copy the images to the 2-split folders
+for filename in os.listdir(src_path):
+    age = int(filename.split('_')[-1].replace('.png', ''))
+    for dst_dir, age_range in age_ranges_2_split.items():
+        if age >= age_range[0] and age < age_range[1]:
+            dst_path = os.path.join(dst_path_2_split, dst_dir)
+            if not os.path.exists(dst_path):
+                os.makedirs(dst_path)
+            shutil.copy(os.path.join(src_path, filename), dst_path)
+
+# copy the images to the 4-split folders
+for filename in os.listdir(src_path):
+    age = int(filename.split('_')[-1].replace('.png', ''))
+    for dst_dir, age_range in age_ranges_4_split.items():
+        if age >= age_range[0] and age <= age_range[1]:
+            dst_path = os.path.join(dst_path_4_split, dst_dir)
+            if not os.path.exists(dst_path):
+                os.makedirs(dst_path)
+            shutil.copy(os.path.join(src_path, filename), dst_path)
