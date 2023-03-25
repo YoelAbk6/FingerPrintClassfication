@@ -8,7 +8,7 @@ from torchvision import transforms
 from torchvision.transforms import ToTensor
 import numpy as np
 
-BATCH_SIZE = 32
+BATCH_SIZE = 1000
 
 
 class CustomImageDataset(Dataset):

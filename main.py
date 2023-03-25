@@ -1,4 +1,5 @@
 from collections import defaultdict
+from skorch import NeuralNetClassifier
 from utils.data_loaders.data_loader import CustomImageDataset
 from utils.models.lists_generator import *
 from utils.output_generator import *
@@ -6,6 +7,8 @@ from networks.train import *
 from evaluate import *
 import itertools
 import os
+from sklearn.model_selection import cross_val_predict
+from cleanlab.classification import CleanLearning
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -31,6 +34,8 @@ def main():
         data = CustomImageDataset(DS_path, device, num_classes)
         train_dataloader, test_dataloader = data.get_train_and_test_data()
 
+        train_dataset_array = next(iter(train_dataloader))[0].numpy()
+        train_labels_array = next(iter(train_dataloader))[1].numpy()
         # Generate lists
         models = get_models_list()
         losses = get_losses_list()
@@ -43,10 +48,10 @@ def main():
         best_accuracy_list_train, best_loss_list_train, best_accuracy_list_test, best_loss_list_test = [], [], [], []
 
         # Try all combinations to find the best one
-        for iter in itertools.product(models, losses, optimizers, learning_rates):
+        for iterable in itertools.product(models, losses, optimizers, learning_rates):
 
             # Extract hyperparameters
-            model_tuple, loss_tuple, optimizer_tuple, lr_tuple = iter
+            model_tuple, loss_tuple, optimizer_tuple, lr_tuple = iterable
             model_name, model = model_tuple
             loss_name, loss = loss_tuple
             optimizer_name, optimizer = optimizer_tuple
@@ -60,7 +65,15 @@ def main():
 
             # Init model to start the train
             curr_model = init_model(model, model_name, device, num_classes)
-
+            model_skorch = NeuralNetClassifier(curr_model)
+            num_crossval_folds = 3  # for efficiency; values like 5 or 10 will generally work better
+            pred_probs = cross_val_predict(
+                model_skorch,
+                train_dataset_array,
+                train_labels_array,
+                cv=num_crossval_folds,
+                method="predict_proba",
+            )
             # Train and test loop
             for t in range(search_best_model_epochs):
                 print(f"Epoch {t+1}\n-------------------------------")
@@ -90,7 +103,7 @@ def main():
                 best_y_real = y_real_list
 
                 best_accuracy = max(curr_accuracy_list_test)
-                best_iter = iter
+                best_iter = iterable
 
         # Handle outputs research
         out_dir = f'./out/{DS_name}/research_best_model/{best_iter[0][0]}'
@@ -117,11 +130,11 @@ def main():
     best_accuracy = -1
 
     # Choose the model that performed the best across all datasets
-    for iter in best_comb_occurences:
-        if best_comb_occurences[iter] > most_used or (best_comb_occurences[iter] == most_used and best_comb_percentage[iter] > best_accuracy):
-            most_used = best_comb_occurences[iter]
-            best_accuracy = best_comb_percentage[iter]
-            best_comb_iter = iter
+    for iterable in best_comb_occurences:
+        if best_comb_occurences[iterable] > most_used or (best_comb_occurences[iterable] == most_used and best_comb_percentage[iterable] > best_accuracy):
+            most_used = best_comb_occurences[iterable]
+            best_accuracy = best_comb_percentage[iterable]
+            best_comb_iter = iterable
 
     model_tuple, loss_tuple, optimizer_tuple, lr_tuple = best_comb_iter
     model_name, model = model_tuple
@@ -202,5 +215,5 @@ def evaluate():
 
 
 if __name__ == '__main__':
-    # main()
-    evaluate()
+    main()
+    # evaluate()
