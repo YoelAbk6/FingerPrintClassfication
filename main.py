@@ -197,8 +197,8 @@ def evaluate():
                 model = load_model(os.path.join(root, file))
                 model.eval()
                 if model is not None:
-                    predict(
-                        model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
+                    #predict(
+                     #   model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
                     clean_lab(
                         model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
 

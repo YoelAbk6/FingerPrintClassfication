@@ -44,7 +44,7 @@ def show_side_by_side(images: list, ncols: int = 6) -> None:
 
 
 def imshow(img):
-    npimg = img.numpy()
+    npimg = img.cpu().numpy()
     return np.transpose(npimg, (1, 2, 0))
 
 
@@ -67,7 +67,7 @@ txt_classes = {0: 'male',
 
 def visualize_outliers(idxs, data):
     data_subset = torch.utils.data.Subset(data, idxs)
-    plot_images(data_subset)
+    plot_images(data_subset, True)
 
 
 def predict(model, DS_path):
@@ -96,9 +96,10 @@ def clean_lab(model, DS_path):
     ood = OutOfDistribution()
     with torch.no_grad():
         for X, y, paths in test_dataloader:
-            y = y.to(device)
+            y = y.cpu()
+            X = X.cpu()
             pred = torch.softmax(model(X), dim=1)
-            pred_probs.append(pred.numpy())
+            pred_probs.append(pred.cpu().numpy())
             labels.append(y.numpy())
 
     pred_probs = np.concatenate(pred_probs, axis=0)
