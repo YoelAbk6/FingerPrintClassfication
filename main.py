@@ -199,6 +199,8 @@ def evaluate():
                 if model is not None:
                     predict(
                         model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
+                    clean_lab(
+                        model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
 
 
 if __name__ == '__main__':
