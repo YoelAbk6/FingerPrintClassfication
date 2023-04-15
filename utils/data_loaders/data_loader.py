@@ -17,7 +17,7 @@ class CustomImageDataset(Dataset):
             transforms.ToPILImage(),
             transforms.Resize(size=(224, 224)),
             transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            transforms.Normalize((0.35, 0.35, 0.35), (0.35, 0.35, 0.35))
         ])
 
         self.device = device
