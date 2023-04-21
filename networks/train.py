@@ -29,11 +29,13 @@ def init_model(model, model_name, device, num_classes):
         out_model.module.classifier[-1] = nn.Sequential(
             nn.Linear(num_features, 128),
             nn.ReLU(inplace=True),
+            nn.Dropout(p=0.5),
             nn.Linear(128, 2)).to(device)
     else:
         out_model.module.fc = nn.Sequential(
             nn.Linear(2048, 128),
             nn.ReLU(inplace=True),
+            nn.Dropout(p=0.5),
             nn.Linear(128, 2)).to(device)
         # num_features = out_model.module.fc.in_features
         # out_model.module.fc = nn.Linear(num_features, num_classes)
