@@ -7,7 +7,9 @@ from PIL import Image
 from torchvision import transforms
 from torchvision.transforms import ToTensor
 import numpy as np
+import random
 
+random.seed(1997)
 BATCH_SIZE = 32
 
 
