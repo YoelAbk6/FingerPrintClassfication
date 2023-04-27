@@ -9,7 +9,10 @@ from torchvision.transforms import ToTensor
 import numpy as np
 import random
 
+torch.manual_seed(1997)
+np.random.seed(1997)
 random.seed(1997)
+
 BATCH_SIZE = 32
 
 

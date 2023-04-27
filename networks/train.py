@@ -2,6 +2,13 @@ import torch
 import torch.nn as nn
 from utils.models.lists_generator import optimizers_init
 import torchvision.models as models
+import torch
+import numpy as np
+import random
+
+torch.manual_seed(1997)
+np.random.seed(1997)
+random.seed(1997)
 
 
 def init_model(model, model_name, device, num_classes):
@@ -11,7 +18,7 @@ def init_model(model, model_name, device, num_classes):
             weights=models.ResNet50_Weights.IMAGENET1K_V2).to(device)
     elif model_name == 'VGG-19':
         out_model = model(
-                weights=models.VGG19_Weights.IMAGENET1K_V1).to(device)
+            weights=models.VGG19_Weights.IMAGENET1K_V1).to(device)
     elif model_name == 'Mobilenet-v2':
         out_model = model(
             weights=models.MobileNet_V2_Weights.IMAGENET1K_V2).to(device)
@@ -83,7 +90,6 @@ def train_loop(dataloader, model, loss_fn, optimizer, device, l2_lambda=0.0005):
     correct /= size
     train_loss /= num_batches
     return 100 * correct, train_loss
-
 
 
 def test_loop(dataloader, model, loss_fn, device):

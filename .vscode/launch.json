@@ -5,12 +5,35 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Run main",
+            "name": "Python: Research",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/main.py",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
+            "args": []
+        },
+
+        {
+            "name": "Python: Simple Run",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/run.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--model",
+                "VGG-19",
+
+                "--optimizer",
+                "Adagrad",
+
+                "--learningRate",
+                "0.0001",
+
+                "--loss",
+                "CrossEntropyLoss"
+            ]
         }
     ]
 }
