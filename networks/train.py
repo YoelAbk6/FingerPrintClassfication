@@ -11,7 +11,7 @@ def init_model(model, model_name, device, num_classes):
             weights=models.ResNet50_Weights.IMAGENET1K_V2).to(device)
     elif model_name == 'VGG-19':
         out_model = model(
-            weights=models.VGG19_Weights.IMAGENET1K_V1).to(device)
+                weights=models.VGG19_Weights.IMAGENET1K_V1).to(device)
     elif model_name == 'Mobilenet-v2':
         out_model = model(
             weights=models.MobileNet_V2_Weights.IMAGENET1K_V2).to(device)
@@ -29,11 +29,13 @@ def init_model(model, model_name, device, num_classes):
         out_model.module.classifier[-1] = nn.Sequential(
             nn.Linear(num_features, 128),
             nn.ReLU(inplace=True),
+            nn.Dropout(p=0.55),
             nn.Linear(128, 2)).to(device)
     else:
         out_model.module.fc = nn.Sequential(
             nn.Linear(2048, 128),
             nn.ReLU(inplace=True),
+            nn.Dropout(p=0.55),
             nn.Linear(128, 2)).to(device)
         # num_features = out_model.module.fc.in_features
         # out_model.module.fc = nn.Linear(num_features, num_classes)
@@ -49,7 +51,7 @@ def init_optimizer(optim, name, model, lr=0.001, momentum=0.9):
         return optim(model.parameters(), lr=lr)
 
 
-def train_loop(dataloader, model, loss_fn, optimizer, device):
+def train_loop(dataloader, model, loss_fn, optimizer, device, l2_lambda=0.0005):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     correct, train_loss = 0, 0
@@ -58,6 +60,14 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         pred = model(X)
         y = y.to(device)
         loss = loss_fn(pred, y)
+        # Add L2 regularization
+        l2_reg = None
+        for param in model.parameters():
+            if l2_reg is None:
+                l2_reg = param.norm(2)
+            else:
+                l2_reg = l2_reg + param.norm(2)
+        loss = loss + l2_lambda * l2_reg
         correct += (pred.argmax(1) == y).type(torch.float).sum().item()
         train_loss += loss.item()
 
@@ -73,6 +83,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
     correct /= size
     train_loss /= num_batches
     return 100 * correct, train_loss
+
 
 
 def test_loop(dataloader, model, loss_fn, device):

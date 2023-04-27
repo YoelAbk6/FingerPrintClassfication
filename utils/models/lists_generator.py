@@ -1,16 +1,20 @@
 import torchvision.models as models
 import torch.nn as nn
 import torch.optim as optim
+import random
 
+random.seed(1997)
 optimizers_init = {"momentum": ['SGD'],
                    "no_momentum": ['Adam', 'Adagrad'], }
 
 
 def get_models_list():
-    return [('Resnet50', models.resnet50),
-            ('Resnet101', models.resnet101),
+    return [
+        # ('Resnet50', models.resnet50),
+        #     ('Resnet101', models.resnet101),
             ('VGG-19', models.vgg19),
-            ('Mobilenet-v2', models.mobilenet_v2), ]
+            # ('Mobilenet-v2', models.mobilenet_v2)
+            ]
 
 
 def get_losses_list():
@@ -18,9 +22,11 @@ def get_losses_list():
 
 
 def get_optimizers_list():
-    return [('Adam', optim.Adam),
-            ('SGD', optim.SGD),
-            ('Adagrad', optim.Adagrad)]
+    return [
+        # ('Adam', optim.Adam),
+        #     ('SGD', optim.SGD),
+            ('Adagrad', optim.Adagrad)
+            ]
 
 
 def get_learning_rates_list():
