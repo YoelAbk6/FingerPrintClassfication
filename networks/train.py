@@ -90,6 +90,8 @@ def train_loop(dataloader, model, loss_fn, optimizer, device, l2_lambda=0.0005):
 
     correct /= size
     train_loss /= num_batches
+    print(
+        f"Train Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {train_loss:>8f} \n")
     return 100 * correct, train_loss
 
 
