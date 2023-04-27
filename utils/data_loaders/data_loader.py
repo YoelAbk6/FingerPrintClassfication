@@ -7,7 +7,9 @@ from PIL import Image
 from torchvision import transforms
 from torchvision.transforms import ToTensor
 import numpy as np
+import random
 
+random.seed(1997)
 BATCH_SIZE = 32
 
 
@@ -68,7 +70,7 @@ class CustomImageDataset(Dataset):
 
         return torch.utils.data.DataLoader(
             train_dataset, batch_size=BATCH_SIZE, sampler=sampler), torch.utils.data.DataLoader(
-            test_dataset, batch_size=BATCH_SIZE, shuffle=True)
+            test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
     def get_data(self):
-        return torch.utils.data.DataLoader(self, batch_size=BATCH_SIZE, shuffle=True)
+        return torch.utils.data.DataLoader(self, batch_size=BATCH_SIZE, shuffle=False)

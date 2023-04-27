@@ -9,7 +9,9 @@ from utils.models.lists_generator import *
 from utils.data_loaders.data_loader import CustomImageDataset
 from cleanlab.outlier import OutOfDistribution
 from cleanlab.rank import find_top_issues
+import random
 
+random.seed(1997)
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 M = 'M'
 F = 'F'
