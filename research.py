@@ -196,18 +196,24 @@ def main():
 
 def evaluate():
 
-    for root, dirs, files in os.walk("./out/NIST4"):
+    for root, dirs, files in os.walk("./out/VGG-19"):
         for file in files:
             if file.endswith('.pt'):
                 model = load_model(os.path.join(root, file))
                 model.eval()
                 if model is not None:
-                    # predict(
-                    #   model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
-                    clean_lab(
+                    predict(
                         model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
 
 
+def clean():
+    model = load_model('out/VGG-19/NIST4/my_model.pt')
+    model.eval()
+    clean_lab(model, 'out/VGG-19/NIST4/alldata.txt',
+              plot_dist=True, plot_top=False)
+
+
 if __name__ == '__main__':
-    main()
+    # main()
     # evaluate()
+    clean()

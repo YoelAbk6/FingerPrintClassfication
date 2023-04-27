@@ -9,6 +9,7 @@ torch.manual_seed(1997)
 np.random.seed(1997)
 random.seed(1997)
 
+random.seed(1997)
 optimizers_init = {"momentum": ['SGD'],
                    "no_momentum": ['Adam', 'Adagrad'], }
 
