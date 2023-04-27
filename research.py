@@ -8,8 +8,11 @@ import itertools
 import os
 import random
 
+torch.manual_seed(1997)
+np.random.seed(1997)
 random.seed(1997)
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -17,7 +20,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 def main():
 
     search_best_model_epochs = 1
-    full_train_epochs = 5
+    full_train_epochs = 15
     num_classes = 2
     best_comb_occurences = defaultdict(int)
     best_comb_percentage = defaultdict(float)

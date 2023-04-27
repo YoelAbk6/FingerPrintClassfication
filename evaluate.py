@@ -9,6 +9,11 @@ from utils.models.lists_generator import *
 from utils.data_loaders.data_loader import CustomImageDataset
 from cleanlab.outlier import OutOfDistribution
 from cleanlab.rank import find_top_issues
+import random
+
+torch.manual_seed(1997)
+np.random.seed(1997)
+random.seed(1997)
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 M = 'M'
@@ -30,7 +35,7 @@ def load_model(model_path):
 
 def show_side_by_side(images: list, ncols: int = 6) -> None:
     f, axes = plt.subplots(
-        nrows=math.ceil(len(images)/ncols), ncols=ncols, sharex=True, sharey=True)
+        nrows=math.ceil(len(images) / ncols), ncols=ncols, sharex=True, sharey=True)
 
     # Loop through the images and plot them in the subplots
     for i, ax in enumerate(axes.flat):

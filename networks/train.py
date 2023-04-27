@@ -2,6 +2,13 @@ import torch
 import torch.nn as nn
 from utils.models.lists_generator import optimizers_init
 import torchvision.models as models
+import torch
+import numpy as np
+import random
+
+torch.manual_seed(1997)
+np.random.seed(1997)
+random.seed(1997)
 
 
 def init_model(model, model_name, device, num_classes):

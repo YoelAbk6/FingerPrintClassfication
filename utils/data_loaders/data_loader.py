@@ -8,8 +8,12 @@ from torchvision.io import read_image
 import torch
 import os
 import random
+import random
 
+torch.manual_seed(1997)
+np.random.seed(1997)
 random.seed(1997)
+
 BATCH_SIZE = 32
 
 
@@ -19,7 +23,7 @@ class CustomImageDataset(Dataset):
             transforms.ToPILImage(),
             transforms.Resize(size=(224, 224)),
             transforms.ToTensor(),
-            transforms.Normalize((0.35, 0.35, 0.35), (0.35, 0.35, 0.35))
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
 
         self.device = device
@@ -70,7 +74,7 @@ class CustomImageDataset(Dataset):
 
         return torch.utils.data.DataLoader(
             train_dataset, batch_size=BATCH_SIZE, sampler=sampler), torch.utils.data.DataLoader(
-            test_dataset, batch_size=BATCH_SIZE, shuffle=True)
+            test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
     def get_data(self):
         return torch.utils.data.DataLoader(self, batch_size=BATCH_SIZE, shuffle=False)
