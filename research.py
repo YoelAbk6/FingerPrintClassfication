@@ -8,7 +8,10 @@ import itertools
 import os
 import random
 
+torch.manual_seed(1997)
+np.random.seed(1997)
 random.seed(1997)
+
 os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -199,8 +202,8 @@ def evaluate():
                 model = load_model(os.path.join(root, file))
                 model.eval()
                 if model is not None:
-                    #predict(
-                     #   model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
+                    # predict(
+                    #   model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
                     clean_lab(
                         model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
 

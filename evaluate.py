@@ -11,7 +11,10 @@ from cleanlab.outlier import OutOfDistribution
 from cleanlab.rank import find_top_issues
 import random
 
+torch.manual_seed(1997)
+np.random.seed(1997)
 random.seed(1997)
+
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 M = 'M'
 F = 'F'
@@ -31,7 +34,7 @@ def load_model(model_path):
 
 def show_side_by_side(images: list, ncols: int = 6) -> None:
     f, axes = plt.subplots(
-        nrows=math.ceil(len(images)/ncols), ncols=ncols, sharex=True, sharey=True)
+        nrows=math.ceil(len(images) / ncols), ncols=ncols, sharex=True, sharey=True)
 
     # Loop through the images and plot them in the subplots
     for i, ax in enumerate(axes.flat):
@@ -55,7 +58,7 @@ def plot_images(dataset, show_labels=False):
     for i in range(15):
         X, y = dataset[i][0:2]
         print(dataset[i][2])
-        ax = plt.subplot(3, 5, i+1)
+        ax = plt.subplot(3, 5, i + 1)
         if show_labels:
             ax.set_title(txt_classes[int(y)])
         ax.imshow(imshow(X))
