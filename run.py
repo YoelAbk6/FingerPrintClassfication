@@ -113,6 +113,8 @@ def main():
         save_conf_matrix(
             f'{out_dir}/Confusion_Matrix.png', y_real_list, y_pred_list)
 
+        save_classification_report(y_real_list, y_pred_list, f'{out_dir}/classification_report.txt')
+
         save_performance_graph(accuracy_list_train, accuracy_list_test,
                                num_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
         save_performance_graph(loss_list_train, loss_list_test, num_epochs,

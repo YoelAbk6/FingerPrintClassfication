@@ -1,5 +1,6 @@
 from sklearn.metrics import confusion_matrix
-import torch 
+from sklearn.metrics import classification_report
+import torch
 import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
@@ -8,12 +9,14 @@ import os
 
 classes = ['Female', 'Male']
 
+
 def save_test_data(dataloader, out_dir):
-    f =  open(os.path.join(out_dir, "testList.txt"), "w")
+    f = open(os.path.join(out_dir, "testList.txt"), "w")
     with torch.no_grad():
         for X, y, paths in dataloader:
             for path in paths:
-                f.write(path+ '\n')
+                f.write(path + '\n')
+
 
 def save_conf_matrix(path, y_real, y_pred):
     cf_matrix = confusion_matrix(y_real, y_pred, normalize='true')
@@ -35,3 +38,11 @@ def save_performance_graph(train_data, test_data, num_epochs, title, save_path):
     plt.legend()
     plt.savefig(save_path)
     plt.clf()
+
+
+def save_classification_report(y_test, y_pred, save_path):
+    report = classification_report(y_test, y_pred, target_names=classes)
+
+    f = open(save_path, 'w')
+    f.write(report)
+    f.close()
