@@ -7,10 +7,11 @@ from evaluate import *
 import itertools
 import os
 import random
+from utils import definitions
 
-torch.manual_seed(1997)
-np.random.seed(1997)
-random.seed(1997)
+torch.manual_seed(definitions.RANDOM_SEED)
+np.random.seed(definitions.RANDOM_SEED)
+random.seed(definitions.RANDOM_SEED)
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'

@@ -10,10 +10,11 @@ from utils.data_loaders.data_loader import CustomImageDataset
 from cleanlab.outlier import OutOfDistribution
 from cleanlab.rank import find_top_issues
 import random
+from utils import definitions
 
-torch.manual_seed(1997)
-np.random.seed(1997)
-random.seed(1997)
+torch.manual_seed(definitions.RANDOM_SEED)
+np.random.seed(definitions.RANDOM_SEED)
+random.seed(definitions.RANDOM_SEED)
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 M = 'M'

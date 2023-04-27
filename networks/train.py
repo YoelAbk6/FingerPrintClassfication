@@ -5,10 +5,11 @@ import torchvision.models as models
 import torch
 import numpy as np
 import random
+from utils import definitions
 
-torch.manual_seed(1997)
-np.random.seed(1997)
-random.seed(1997)
+torch.manual_seed(definitions.RANDOM_SEED)
+np.random.seed(definitions.RANDOM_SEED)
+random.seed(definitions.RANDOM_SEED)
 
 
 def init_model(model, model_name, device, num_classes):

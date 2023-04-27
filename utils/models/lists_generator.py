@@ -4,12 +4,12 @@ import torch.optim as optim
 import random
 import torch
 import numpy as np
+from utils import definitions
 
-torch.manual_seed(1997)
-np.random.seed(1997)
-random.seed(1997)
+torch.manual_seed(definitions.RANDOM_SEED)
+np.random.seed(definitions.RANDOM_SEED)
+random.seed(definitions.RANDOM_SEED)
 
-random.seed(1997)
 optimizers_init = {"momentum": ['SGD'],
                    "no_momentum": ['Adam', 'Adagrad'], }
 

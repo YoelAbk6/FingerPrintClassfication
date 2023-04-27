@@ -9,10 +9,11 @@ import torch
 import os
 import random
 import random
+from utils import definitions
 
-torch.manual_seed(1997)
-np.random.seed(1997)
-random.seed(1997)
+torch.manual_seed(definitions.RANDOM_SEED)
+np.random.seed(definitions.RANDOM_SEED)
+random.seed(definitions.RANDOM_SEED)
 
 BATCH_SIZE = 32
 
