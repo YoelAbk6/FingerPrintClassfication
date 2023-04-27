@@ -1,7 +1,9 @@
 import torchvision.models as models
 import torch.nn as nn
 import torch.optim as optim
+import random
 
+random.seed(1997)
 optimizers_init = {"momentum": ['SGD'],
                    "no_momentum": ['Adam', 'Adagrad'], }
 

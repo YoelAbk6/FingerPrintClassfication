@@ -1,13 +1,15 @@
-import os
-import torch
-from torchvision.io import read_image
-from torch.utils.data import Dataset
-from torch.utils.data import WeightedRandomSampler
-from PIL import Image
-from torchvision import transforms
-from torchvision.transforms import ToTensor
 import numpy as np
+from torchvision.transforms import ToTensor
+from torchvision import transforms
+from PIL import Image
+from torch.utils.data import WeightedRandomSampler
+from torch.utils.data import Dataset
+from torchvision.io import read_image
+import torch
+import os
+import random
 
+random.seed(1997)
 BATCH_SIZE = 32
 
 
@@ -71,4 +73,4 @@ class CustomImageDataset(Dataset):
             test_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     def get_data(self):
-        return torch.utils.data.DataLoader(self, batch_size=BATCH_SIZE, shuffle=True)
+        return torch.utils.data.DataLoader(self, batch_size=BATCH_SIZE, shuffle=False)

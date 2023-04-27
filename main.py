@@ -6,7 +6,9 @@ from networks.train import *
 from evaluate import *
 import itertools
 import os
+import random
 
+random.seed(1997)
 os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -191,7 +193,7 @@ def main():
 
 def evaluate():
 
-    for root, dirs, files in os.walk("./out/NIST4"):
+    for root, dirs, files in os.walk("./out/VGG-19"):
         for file in files:
             if file.endswith('.pt'):
                 model = load_model(os.path.join(root, file))
@@ -199,10 +201,16 @@ def evaluate():
                 if model is not None:
                     predict(
                         model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
-                    clean_lab(
-                        model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
+
+
+def clean():
+    model = load_model('out/VGG-19/NIST4/my_model.pt')
+    model.eval()
+    clean_lab(model, 'out/VGG-19/NIST4/alldata.txt',
+              plot_dist=True, plot_top=False)
 
 
 if __name__ == '__main__':
     # main()
-    evaluate()
+    # evaluate()
+    clean()
