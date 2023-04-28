@@ -6,6 +6,7 @@ import torch
 import numpy as np
 import random
 from utils import definitions
+from utils.output_generator import print_and_save
 
 torch.manual_seed(definitions.RANDOM_SEED)
 np.random.seed(definitions.RANDOM_SEED)
@@ -59,7 +60,7 @@ def init_optimizer(optim, name, model, lr=0.001, momentum=0.9):
         return optim(model.parameters(), lr=lr)
 
 
-def train_loop(dataloader, model, loss_fn, optimizer, device, l2_lambda=0.0005):
+def train_loop(dataloader, model, loss_fn, optimizer, device, path, l2_lambda=0.0005):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     correct, train_loss = 0, 0
@@ -86,16 +87,16 @@ def train_loop(dataloader, model, loss_fn, optimizer, device, l2_lambda=0.0005):
 
         if batch % 100 == 0:
             loss, current = loss.item(), batch * len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+            print_and_save(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]", path)
 
     correct /= size
     train_loss /= num_batches
-    print(
-        f"Train Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {train_loss:>8f} \n")
+    print_and_save(
+        f"Train Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {train_loss:>8f} \n", path)
     return 100 * correct, train_loss
 
 
-def test_loop(dataloader, model, loss_fn, device):
+def test_loop(dataloader, model, loss_fn, device, path):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     test_loss, correct = 0, 0
@@ -112,7 +113,7 @@ def test_loop(dataloader, model, loss_fn, device):
 
     test_loss /= num_batches
     correct /= size
-    print(
-        f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    print_and_save(
+        f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n", path)
 
     return 100 * correct, y_pred, y_true, test_loss
