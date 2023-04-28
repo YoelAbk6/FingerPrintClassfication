@@ -41,8 +41,16 @@ def save_performance_graph(train_data, test_data, num_epochs, title, save_path):
 
 
 def save_classification_report(y_test, y_pred, save_path):
+
     report = classification_report(y_test, y_pred, target_names=classes)
 
-    f = open(save_path, 'w')
-    f.write(report)
-    f.close()
+    with open(save_path, 'w') as f:
+        f.write(report)
+
+
+def print_and_save(message, path):
+
+    print(message)
+
+    with open(f'{path}/log.txt', 'a+') as f:
+        f.write(f'{message}\n')
