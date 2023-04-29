@@ -40,7 +40,7 @@ def get_learning_rates_list():
 
 
 def get_data_sets_list():
-    return [("NIST302a-M", 'data/NIST302/auxiliary/flat/M/500/plain/png/equal'),
+    return [("NIST302a-M", 'data/NIST302/auxiliary/flat/M/500/plain/png/regular'),
             # ("SOCOfing", 'data/SOCOFing/Real'),
             # ("NIST4", 'data/sd04/png_txt/figs')
             ]
