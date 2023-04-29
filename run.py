@@ -13,7 +13,7 @@ torch.manual_seed(definitions.RANDOM_SEED)
 np.random.seed(definitions.RANDOM_SEED)
 random.seed(definitions.RANDOM_SEED)
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -61,7 +61,7 @@ def parse_args():
 def main():
 
     args = parse_args()
-    num_epochs = 15
+    num_epochs = 20
     num_classes = 2
 
     data_sets = get_data_sets_list()
@@ -72,6 +72,7 @@ def main():
     optimizer = optimizers.get(optimizer_name)
     lr = float(args.learningRate)
     loss = losses.get(args.loss)
+    y_pred = y_real = None
 
     # Loop through all datasets best model
     for DS_name, DS_path in data_sets:
@@ -108,7 +109,7 @@ def main():
             accuracy_list_train.append(accuracy_train)
             loss_list_train.append(loss_train)
 
-            curr_accuracy, curr_y_pred, curr_y_real, loss_test = test_loop(
+            curr_accuracy, y_pred, y_real, loss_test = test_loop(
                 test_dataloader,
                 curr_model,
                 loss,
@@ -116,8 +117,8 @@ def main():
                 out_dir)
             accuracy_list_test.append(curr_accuracy)
             loss_list_test.append(loss_test)
-            y_pred_list.extend(curr_y_pred)
-            y_real_list.extend(curr_y_real)
+            # y_pred_list.extend(curr_y_pred)
+            # y_real_list.extend(curr_y_real)
 
             if curr_accuracy > best_test_accuracy:
                 best_test_accuracy = curr_accuracy
@@ -127,9 +128,9 @@ def main():
 
         # Handle outputs
         save_conf_matrix(
-            f'{out_dir}/Confusion_Matrix.png', y_real_list, y_pred_list)
+            f'{out_dir}/Confusion_Matrix.png', y_real, y_pred)
 
-        save_classification_report(y_real_list, y_pred_list, f'{out_dir}/classification_report.txt')
+        save_classification_report(y_real, y_pred, f'{out_dir}/classification_report.txt')
 
         save_performance_graph(accuracy_list_train, accuracy_list_test,
                                num_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
