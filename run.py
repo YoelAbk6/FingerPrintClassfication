@@ -90,8 +90,9 @@ def main():
         data = CustomImageDataset(DS_path, device, num_classes)
         train_dataloader, test_dataloader = data.get_train_and_test_data()
         accuracy_list_train, loss_list_train, accuracy_list_test, loss_list_test = [], [], [], []
-        y_pred_list, y_real_list = [], []
         best_test_accuracy = best_train_accuracy = 0
+        best_y_pred, best_y_real = [], []
+        best_loss = None
 
         curr_model = init_model(model, model_name, device, num_classes)
         # Train and test loop
@@ -117,27 +118,27 @@ def main():
                 out_dir)
             accuracy_list_test.append(curr_accuracy)
             loss_list_test.append(loss_test)
-            # y_pred_list.extend(curr_y_pred)
-            # y_real_list.extend(curr_y_real)
 
-            if curr_accuracy > best_test_accuracy:
-                best_test_accuracy = curr_accuracy
+            best_test_accuracy = max(best_test_accuracy, curr_accuracy)
+            best_train_accuracy = max(best_train_accuracy, accuracy_train)
 
-            if accuracy_train > best_train_accuracy:
-                best_train_accuracy = accuracy_train
+            if best_loss is None or best_loss > loss_test:
+                best_loss = loss_test
+                best_y_real = y_real
+                best_y_pred = y_pred
+                # Save model
+                torch.save(curr_model.state_dict(), f'{out_dir}/my_model.pt')
 
         # Handle outputs
         save_conf_matrix(
-            f'{out_dir}/Confusion_Matrix.png', y_real, y_pred)
+            f'{out_dir}/Confusion_Matrix.png', best_y_real, best_y_pred)
 
-        save_classification_report(y_real, y_pred, f'{out_dir}/classification_report.txt')
+        save_classification_report(best_y_real, best_y_pred, f'{out_dir}/classification_report.txt')
 
         save_performance_graph(accuracy_list_train, accuracy_list_test,
                                num_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
         save_performance_graph(loss_list_train, loss_list_test, num_epochs,
                                "Loss", f'{out_dir}/Loss_graph.png')
-        # Save model
-        torch.save(curr_model.state_dict(), f'{out_dir}/my_model.pt')
         save_test_data(test_dataloader, out_dir)
         print_and_save(
             '=================================================================================================', out_dir)
