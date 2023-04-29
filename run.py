@@ -92,7 +92,6 @@ def main():
         accuracy_list_train, loss_list_train, accuracy_list_test, loss_list_test = [], [], [], []
         best_test_accuracy = best_train_accuracy = 0
         best_y_pred, best_y_real = [], []
-        best_loss = None
 
         curr_model = init_model(model, model_name, device, num_classes)
         # Train and test loop
@@ -119,15 +118,14 @@ def main():
             accuracy_list_test.append(curr_accuracy)
             loss_list_test.append(loss_test)
 
-            best_test_accuracy = max(best_test_accuracy, curr_accuracy)
-            best_train_accuracy = max(best_train_accuracy, accuracy_train)
-
-            if best_loss is None or best_loss > loss_test:
-                best_loss = loss_test
+            if curr_accuracy > best_test_accuracy:
+                best_test_accuracy = curr_accuracy
                 best_y_real = y_real
                 best_y_pred = y_pred
                 # Save model
                 torch.save(curr_model.state_dict(), f'{out_dir}/my_model.pt')
+
+            best_train_accuracy = max(best_train_accuracy, accuracy_train)
 
         # Handle outputs
         save_conf_matrix(
