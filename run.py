@@ -75,44 +75,61 @@ def main():
 
     # Loop through all datasets best model
     for DS_name, DS_path in data_sets:
-        print('=================================================================================================')
-        print(
-            f'Training {model_name} on {DS_name} started')
-        print('=================================================================================================')
+
+        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}/'
+        os.makedirs(out_dir, exist_ok=True)
+
+        print_and_save(
+            '=================================================================================================', out_dir)
+        print_and_save(
+            f'Training {model_name} on {DS_name} started', out_dir)
+        print_and_save(
+            '=================================================================================================', out_dir)
 
         data = CustomImageDataset(DS_path, device, num_classes)
         train_dataloader, test_dataloader = data.get_train_and_test_data()
         accuracy_list_train, loss_list_train, accuracy_list_test, loss_list_test = [], [], [], []
         y_pred_list, y_real_list = [], []
-        best_accuracy = 0
+        best_test_accuracy = best_train_accuracy = 0
 
         curr_model = init_model(model, model_name, device, num_classes)
         # Train and test loop
         for t in range(num_epochs):
-            print(f"Epoch {t+1}\n-------------------------------")
+            print_and_save(f"Epoch {t+1}\n-------------------------------", out_dir)
             curr_optim = init_optimizer(
                 optimizer, optimizer_name, curr_model, lr)
+
             accuracy_train, loss_train = train_loop(train_dataloader,
                                                     curr_model,
                                                     loss,
                                                     curr_optim,
-                                                    device)
+                                                    device,
+                                                    out_dir)
             accuracy_list_train.append(accuracy_train)
             loss_list_train.append(loss_train)
+
             curr_accuracy, curr_y_pred, curr_y_real, loss_test = test_loop(
-                test_dataloader, curr_model, loss, device)
+                test_dataloader,
+                curr_model,
+                loss,
+                device,
+                out_dir)
             accuracy_list_test.append(curr_accuracy)
             loss_list_test.append(loss_test)
             y_pred_list.extend(curr_y_pred)
             y_real_list.extend(curr_y_real)
-            if curr_accuracy > best_accuracy:
-                best_accuracy = curr_accuracy
+
+            if curr_accuracy > best_test_accuracy:
+                best_test_accuracy = curr_accuracy
+
+            if accuracy_train > best_train_accuracy:
+                best_train_accuracy = accuracy_train
 
         # Handle outputs
-        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}/'
-        os.makedirs(out_dir, exist_ok=True)
         save_conf_matrix(
             f'{out_dir}/Confusion_Matrix.png', y_real_list, y_pred_list)
+
+        save_classification_report(y_real_list, y_pred_list, f'{out_dir}/classification_report.txt')
 
         save_performance_graph(accuracy_list_train, accuracy_list_test,
                                num_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
@@ -121,10 +138,12 @@ def main():
         # Save model
         torch.save(curr_model.state_dict(), f'{out_dir}/my_model.pt')
         save_test_data(test_dataloader, out_dir)
-        print('=================================================================================================')
-        print(
-            f'Train {model_name} on {DS_name} is done, best accuracy reached: {best_accuracy:>0.2f}%, model is saved in best_model_state_dict')
-        print('=================================================================================================')
+        print_and_save(
+            '=================================================================================================', out_dir)
+        print_and_save(
+            f'Train {model_name} on {DS_name} is done\nBest accuracy train reached: {best_train_accuracy:>0.2f}%\nBest accuracy test reached: {best_test_accuracy:>0.2f}%\nModel is saved in best_model_state_dict', out_dir)
+        print_and_save(
+            '=================================================================================================', out_dir)
 
     print("The run is done")
 

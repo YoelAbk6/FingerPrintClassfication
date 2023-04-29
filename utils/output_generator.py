@@ -1,10 +1,12 @@
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
 import torch
 import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import shutil
 
 classes = ['Female', 'Male']
 
@@ -60,3 +62,19 @@ def copy_pictures_from_path_to_location(pathes, new_folder_name):
 
         # copy the file to the new location
         shutil.copy(path, new_file_path)
+
+
+def save_classification_report(y_test, y_pred, save_path):
+
+    report = classification_report(y_test, y_pred, target_names=classes)
+
+    with open(save_path, 'w') as f:
+        f.write(report)
+
+
+def print_and_save(message, path):
+
+    print(message)
+
+    with open(f'{path}/log.txt', 'a+') as f:
+        f.write(f'{message}\n')
