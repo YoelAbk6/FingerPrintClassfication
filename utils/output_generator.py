@@ -6,6 +6,7 @@ import seaborn as sn
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import shutil
 
 classes = ['Female', 'Male']
 
@@ -38,6 +39,29 @@ def save_performance_graph(train_data, test_data, num_epochs, title, save_path):
     plt.legend()
     plt.savefig(save_path)
     plt.clf()
+
+
+def copy_pictures_from_path_to_location(pathes, new_folder_name):
+    for path in pathes:
+        # get the directory, filename, and extension
+        dir_path, file_name = os.path.split(path)
+        file_name, ext = os.path.splitext(file_name)
+
+        # get the parent directory of the current directory
+        parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
+
+        # construct the new directory path
+        new_dir_path = os.path.join(
+            parent_dir_path, new_folder_name, os.path.basename(dir_path))
+
+        # create the new directory if it doesn't exist
+        os.makedirs(new_dir_path, exist_ok=True)
+
+        # construct the new file path
+        new_file_path = os.path.join(new_dir_path, file_name + ext)
+
+        # copy the file to the new location
+        shutil.copy(path, new_file_path)
 
 
 def save_classification_report(y_test, y_pred, save_path):
