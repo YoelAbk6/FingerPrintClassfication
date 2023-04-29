@@ -3,8 +3,10 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 # Directory containing fingerprint images
-fingerprint_dir = "D:/data/NIST302/images/auxiliary/flat/K/500/plain/png"
-fingerprint_dir_out = "D:/data/NIST302/images/auxiliary/flat/K/500/plain/png/inner"
+fingerprint_dir = "/home/uoriko/FingerPrintClassfication/data/sd04/png_txt/figs/"
+fingerprint_dir_out = "/home/uoriko/FingerPrintClassfication/data/sd04/png_txt/inner/"
+
+search_contours = False
 
 # Iterate over all fingerprint images in the directory
 for filename in os.listdir(fingerprint_dir):
@@ -42,7 +44,15 @@ for filename in os.listdir(fingerprint_dir):
 
         # Get the bounding rectangle of the largest contour (assumed to be the fingerprint)
         # idx = 0 if len(contours) == 1 else 1
-        x, y, w, h = cv2.boundingRect(contours[-1])
+        
+        if search_contours:
+          try:
+            x, y, w, h = cv2.boundingRect(contours[-1])
+          except:
+            # if failed, take the image center and size
+            x, y, w, h = 0, 0, img.shape[0], img.shape[1]
+        else:
+          x, y, w, h = 0, 0, img.shape[0], img.shape[1]
 
         # Calculate the center point and major/minor axes of the ellipse
         center_x = x + int(w / 2)
