@@ -1,5 +1,5 @@
 from sklearn.metrics import confusion_matrix
-import torch 
+import torch
 import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
@@ -8,12 +8,14 @@ import os
 
 classes = ['Female', 'Male']
 
+
 def save_test_data(dataloader, out_dir):
-    f =  open(os.path.join(out_dir, "testList.txt"), "w")
+    f = open(os.path.join(out_dir, "testList.txt"), "w")
     with torch.no_grad():
         for X, y, paths in dataloader:
             for path in paths:
-                f.write(path+ '\n')
+                f.write(path + '\n')
+
 
 def save_conf_matrix(path, y_real, y_pred):
     cf_matrix = confusion_matrix(y_real, y_pred, normalize='true')
@@ -35,3 +37,26 @@ def save_performance_graph(train_data, test_data, num_epochs, title, save_path):
     plt.legend()
     plt.savefig(save_path)
     plt.clf()
+
+
+def copy_pictures_from_path_to_location(pathes, new_folder_name):
+    for path in pathes:
+        # get the directory, filename, and extension
+        dir_path, file_name = os.path.split(path)
+        file_name, ext = os.path.splitext(file_name)
+
+        # get the parent directory of the current directory
+        parent_dir_path = os.path.abspath(os.path.join(dir_path, os.pardir))
+
+        # construct the new directory path
+        new_dir_path = os.path.join(
+            parent_dir_path, new_folder_name, os.path.basename(dir_path))
+
+        # create the new directory if it doesn't exist
+        os.makedirs(new_dir_path, exist_ok=True)
+
+        # construct the new file path
+        new_file_path = os.path.join(new_dir_path, file_name + ext)
+
+        # copy the file to the new location
+        shutil.copy(path, new_file_path)

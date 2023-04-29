@@ -142,3 +142,5 @@ def clean_lab(model, DS_path, plot_dist=False, plot_top=False):
     ood_features_indices = sorted_idxs[ood_features_scores < fifth_percentile]
     clean_data = [data.image_paths[i] for i in range(
         len(ood_features_indices)) if i not in ood_features_indices]
+
+    copy_pictures_from_path_to_location(clean_data, 'clean_lab')
