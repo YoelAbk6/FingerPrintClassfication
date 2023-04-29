@@ -41,6 +41,12 @@ def get_learning_rates_list():
 
 def get_data_sets_list():
     return [("NIST302a-M", 'data/NIST302/auxiliary/flat/M/500/plain/png/regular'),
-            # ("SOCOfing", 'data/SOCOFing/Real'),
-            # ("NIST4", 'data/sd04/png_txt/figs')
+            ("NIST302a-M-inner30", 'data/NIST302/auxiliary/flat/M/500/plain/png/inner30'),
+            ("NIST302a-M-inner60", 'data/NIST302/auxiliary/flat/M/500/plain/png/inner60'),
+            ("NIST302a-M-4-split-18to28", 'data/NIST302/auxiliary/flat/M/500/plain/png/age-4-split/18to28'),
+            ("NIST302a-M-4-split-28to38", 'data/NIST302/auxiliary/flat/M/500/plain/png/age-4-split/28to38'),
+            ("NIST302a-M-4-split-38to48", 'data/NIST302/auxiliary/flat/M/500/plain/png/age-4-split/38to48'),
+            ("NIST302a-M-4-split-48to58", 'data/NIST302/auxiliary/flat/M/500/plain/png/age-4-split/48to58'),
+            ("SOCOfing", 'data/SOCOFing/Real'),
+            ("NIST4", 'data/sd04/png_txt/figs')
             ]
