@@ -146,17 +146,16 @@ def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
     copy_pictures_from_path_to_location(clean_data, 'clean_lab')
 
 
-def filter_images_by_confidence_score(model, DS_path, plot=True):
+def filter_images_by_confidence_score(model, DS_path, plot=True, create_DB=False):
     conf_threshold = 0.8
     bad_indices = []
 
-    data = CustomImageDataset(DS_path, device, num_classes, use_file=True)
+    data = CustomImageDataset(
+        f'{DS_path}all_data.txt', device, num_classes, use_file=True)
     dataloader = data.get_data()
     confidences = []
     with torch.no_grad():
         for i, (X, y, paths) in enumerate(dataloader):
-            # y = y.cpu()
-            # X = X.cpu()
             probs = torch.softmax(model(X), dim=1)
             confidence = torch.max(probs, dim=1)[
                 0] - torch.min(probs, dim=1)[0]
@@ -170,11 +169,15 @@ def filter_images_by_confidence_score(model, DS_path, plot=True):
     clean_data = [data.image_paths[i] for i in range(
         len(data.image_paths)) if i not in bad_indices]
 
+    print(f'{len(data.image_paths) - len(clean_data)} pictures will be removed from the DB, with conf_threshold = {conf_threshold}')
+
     if plot:
         plt.hist(confidences, bins=50)
+        plt.axvline(x=conf_threshold, color='red', linestyle='--')
         plt.xlabel('Confidence Score')
         plt.ylabel('Count')
         plt.title('Distribution of Confidence Scores')
         plt.show()
 
-    copy_pictures_from_path_to_location(clean_data, 'confidence')
+    if create_DB:
+        copy_pictures_from_path_to_location(clean_data, 'confidence')
