@@ -95,10 +95,10 @@ def predict(model, DS_path):
             show_side_by_side(imgs)
 
 
-def clean_lab(model, DS_path, plot_dist=False, plot_top=False):
+def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
     ood = OutOfDistribution()
 
-    data = CustomImageDataset(DS_path, device, num_classes, use_file=True)
+    data = CustomImageDataset(f'{DS_path}all_data.txt', device, num_classes, use_file=True)
     dataloader = data.get_data()
 
     pred_probs = []
@@ -135,12 +135,12 @@ def clean_lab(model, DS_path, plot_dist=False, plot_top=False):
         plt.xlabel('Outlier score')
         plt.ylabel('Frequency')
         plt.axvline(x=fifth_percentile, color='red', linewidth=2)
-        plt.show()
+        plt.savefig(f'{output_path}ood.png')
 
     sorted_idxs = ood_features_scores.argsort()
     ood_features_scores = ood_features_scores[sorted_idxs]
     ood_features_indices = sorted_idxs[ood_features_scores < fifth_percentile]
     clean_data = [data.image_paths[i] for i in range(
-        len(ood_features_indices)) if i not in ood_features_indices]
+        len(data.image_paths)) if i not in ood_features_indices]
 
     copy_pictures_from_path_to_location(clean_data, 'clean_lab')

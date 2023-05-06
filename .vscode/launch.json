@@ -23,7 +23,7 @@
             "justMyCode": true,
             "args": [
                 "--model",
-                "VGG-19",
+                "Resnet18",
 
                 "--optimizer",
                 "Adagrad",

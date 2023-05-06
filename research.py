@@ -208,9 +208,9 @@ def evaluate():
 
 
 def clean():
-    model = load_model('out/VGG-19/NIST4/my_model.pt')
-    model.eval()
-    clean_lab(model, 'out/VGG-19/NIST4/alldata.txt',
+    model = load_model('out/NIST4/simple_run_rs=4444/VGG-19/my_model.pt')
+    model.eval() 
+    clean_lab(model, 'data/sd04/png_txt/', 'out/NIST4/simple_run_rs=4444/VGG-19/',
               plot_dist=True, plot_top=False)
 
 

@@ -19,6 +19,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 models = {
     'Resnet50': models.resnet50,
+    'Resnet18': models.resnet18,
     'Resnet101': models.resnet101,
     'VGG-19': models.vgg19,
     'Mobilenet-v2': models.mobilenet_v2

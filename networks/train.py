@@ -27,6 +27,9 @@ def init_model(model, model_name, device, num_classes):
     elif model_name == 'Resnet101':
         out_model = model(
             weights=models.ResNet101_Weights.IMAGENET1K_V2).to(device)
+    elif model_name == 'Resnet18':
+        out_model = model(
+            weights=models.ResNet18_Weights.IMAGENET1K_V1).to(device)
     else:
         raise Exception(
             f'Need to init {model_name} in networks.train.init_model() function!\n')
@@ -41,8 +44,9 @@ def init_model(model, model_name, device, num_classes):
             nn.Dropout(p=0.55),
             nn.Linear(128, 2)).to(device)
     else:
+        num_features = out_model.module.inplanes
         out_model.module.fc = nn.Sequential(
-            nn.Linear(2048, 128),
+            nn.Linear(num_features, 128),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.55),
             nn.Linear(128, 2)).to(device)
