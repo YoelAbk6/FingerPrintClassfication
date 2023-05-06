@@ -141,6 +141,31 @@ def clean_lab(model, DS_path, plot_dist=False, plot_top=False):
     ood_features_scores = ood_features_scores[sorted_idxs]
     ood_features_indices = sorted_idxs[ood_features_scores < fifth_percentile]
     clean_data = [data.image_paths[i] for i in range(
-        len(ood_features_indices)) if i not in ood_features_indices]
+        len(data.image_paths)) if i not in ood_features_indices]
 
     copy_pictures_from_path_to_location(clean_data, 'clean_lab')
+
+
+def filter_images_by_confidence_score(model, DS_path):
+    conf_threshold = 0.8
+    bad_indices = []
+
+    data = CustomImageDataset(DS_path, device, num_classes, use_file=True)
+    dataloader = data.get_data()
+
+    with torch.no_grad():
+        for i, (X, y, paths) in enumerate(dataloader):
+            # y = y.cpu()
+            # X = X.cpu()
+            probs = torch.softmax(model(X), dim=1)
+            confidence = torch.max(probs, dim=1)[
+                0] - torch.min(probs, dim=1)[0]
+
+            for j, c in enumerate(confidence):
+                if c < conf_threshold:
+                    bad_indices.append(i * len(probs) + j)
+
+    clean_data = [data.image_paths[i] for i in range(
+        len(data.image_paths)) if i not in bad_indices]
+
+    copy_pictures_from_path_to_location(clean_data, 'confidence')
