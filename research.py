@@ -214,7 +214,14 @@ def clean():
               plot_dist=True, plot_top=False)
 
 
+def filter_by_conf():
+    model = load_model('out/VGG-19/NIST4/my_model.pt')
+    model.eval()
+    filter_images_by_confidence_score(model, 'out/VGG-19/NIST4/testList.txt')
+
+
 if __name__ == '__main__':
     # main()
     # evaluate()
-    clean()
+    # clean()
+    filter_by_conf()
