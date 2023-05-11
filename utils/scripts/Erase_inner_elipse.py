@@ -5,21 +5,20 @@ import matplotlib.pyplot as plt
 
 data_dir = "/home/uoriko/FingerPrintClassfication/data/"
 
-dirs = [  # f"{data_dir}NIST302/auxiliary/flat/M/500/plain/png/regular",
+dirs = [
+    # f"{data_dir}NIST302/auxiliary/flat/M/500/plain/png/regular",
     f"{data_dir}SOCOFing/Real",
     f"{data_dir}sd04/png_txt/figs"
 ]
 
-figs = [("60", 0.3),
-        ("30", 0.15)
-        ]
+figs = [("50", 0.25)]
 
 for input_dir in dirs:
     for fig_string, fig_num in figs:
 
-        output_dir = f"{os.path.dirname(input_dir)}/inner{fig_string}"
+        output_dir = f"{os.path.dirname(input_dir)}/outer{fig_string}"
         os.makedirs(output_dir, exist_ok=True)
-        print(f"Starting {input_dir} inner {fig_string}")
+        print(f"Starting {input_dir} outer {fig_string}")
 
         # Iterate over all fingerprint images in the directory
         for filename in os.listdir(input_dir):
@@ -75,11 +74,14 @@ for input_dir in dirs:
                 minor_axis = int(h * fig_num)
 
                 # Create a white image the same size as the fingerprint
-                ellipse_mask = np.full(img.shape, 255, dtype=np.uint8)
+                ellipse_mask = np.full(img.shape, 0, dtype=np.uint8)
 
                 # Draw an ellipse on the white image, we can change the angle of what's left
                 cv2.ellipse(ellipse_mask, (center_x, center_y),
-                            (major_axis, minor_axis), 0, 0, 360, 0, thickness=-1)
+                            (major_axis, minor_axis), 0, 0, 360, (255, 255, 255), thickness=-1)
+
+                # plt.imshow(ellipse_mask)
+                # plt.show()
 
                 # ----For outer----#
                 # inverted_img = cv2.bitwise_not(img)
@@ -96,4 +98,4 @@ for input_dir in dirs:
 
                 # Save the modified image to a new file
                 cv2.imwrite(os.path.join(
-                    output_dir, f'inner{fig_string}_' + filename), img)
+                    output_dir, f'outer{fig_string}_' + filename), img)
