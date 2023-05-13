@@ -21,6 +21,9 @@ def init_model(model, model_name, device, num_classes):
     elif model_name == 'VGG-19':
         out_model = model(
             weights=models.VGG19_Weights.IMAGENET1K_V1).to(device)
+    elif model_name == 'VGG-16':
+        out_model = model(
+            weights=models.VGG16_Weights.IMAGENET1K_V1).to(device)
     elif model_name == 'Mobilenet-v2':
         out_model = model(
             weights=models.MobileNet_V2_Weights.IMAGENET1K_V2).to(device)
@@ -50,8 +53,6 @@ def init_model(model, model_name, device, num_classes):
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.55),
             nn.Linear(128, 2)).to(device)
-        # num_features = out_model.module.fc.in_features
-        # out_model.module.fc = nn.Linear(num_features, num_classes)
 
     out_model.to(device)
     return out_model
