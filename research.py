@@ -203,25 +203,25 @@ def evaluate():
                 model = load_model(os.path.join(root, file))
                 model.eval()
                 if model is not None:
-                    predict(
-                        model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
+                    predict(model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
 
 
-def clean():
-    model = load_model('out/NIST4/simple_run_rs=4444/VGG-19/my_model.pt')
-    model.eval() 
-    clean_lab(model, 'data/sd04/png_txt/', 'out/NIST4/simple_run_rs=4444/VGG-19/',
-              plot_dist=True, plot_top=False)
-
-
-def filter_by_conf():
-    model = load_model('out/VGG-19/NIST4/my_model.pt')
+def clean(DS_path, out_path):
+    model = load_model(f'{out_path}/my_model.pt')
     model.eval()
-    filter_images_by_confidence_score(model, 'out/VGG-19/NIST4/testList.txt')
+    clean_lab(model, DS_path, out_path, plot_dist=True, plot_top=False)
+
+
+def filter_by_conf(DS_path, out_path):
+    model = load_model(f'{out_path}/my_model.pt')
+    model.eval()
+    filter_images_by_confidence_score(model, DS_path, out_path, plot=False, create_DB=True)
 
 
 if __name__ == '__main__':
     # main()
     # evaluate()
-    # clean()
-    filter_by_conf()
+    clean('data/NIST302/auxiliary/flat/M/500/plain/png',
+          'out/NIST302a-M/simple_run_rs=4444/VGG-19')
+    # filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png',
+    #                'out/NIST302a-M/simple_run_rs=4444/VGG-19')

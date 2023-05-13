@@ -21,6 +21,7 @@ models = {
     'Resnet50': models.resnet50,
     'Resnet18': models.resnet18,
     'Resnet101': models.resnet101,
+    'VGG-16': models.vgg16,
     'VGG-19': models.vgg19,
     'Mobilenet-v2': models.mobilenet_v2
 }
@@ -78,7 +79,7 @@ def main():
     # Loop through all datasets best model
     for DS_name, DS_path in data_sets:
 
-        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}/'
+        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}-augmented/'
         os.makedirs(out_dir, exist_ok=True)
 
         print_and_save(
