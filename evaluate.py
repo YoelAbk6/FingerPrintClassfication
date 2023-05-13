@@ -60,7 +60,7 @@ def plot_images(dataset, show_labels=False):
     for i in range(TOP_ISSUES):
         X, y = dataset[i][0:2]
         print(dataset[i][2])
-        ax = plt.subplot(9, 5, i+1)
+        ax = plt.subplot(9, 5, i + 1)
         if show_labels:
             ax.set_title(txt_classes[int(y)])
         ax.imshow(imshow(X))
@@ -98,7 +98,7 @@ def predict(model, DS_path):
 def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
     ood = OutOfDistribution()
 
-    data = CustomImageDataset(f'{DS_path}all_data.txt', device, num_classes, use_file=True)
+    data = CustomImageDataset(f'{DS_path}/all_data.txt', device, num_classes, use_file=True)
     dataloader = data.get_data()
 
     pred_probs = []
@@ -146,12 +146,9 @@ def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
     copy_pictures_from_path_to_location(clean_data, 'clean_lab')
 
 
-def filter_images_by_confidence_score(model, DS_path, plot=True, create_DB=False):
-    conf_threshold = 0.8
-    bad_indices = []
-
+def filter_images_by_confidence_score(model, DS_path, output_path, plot=True, create_DB=False):
     data = CustomImageDataset(
-        f'{DS_path}all_data.txt', device, num_classes, use_file=True)
+        f'{DS_path}/all_data.txt', device, num_classes, use_file=True)
     dataloader = data.get_data()
     confidences = []
     with torch.no_grad():
@@ -162,22 +159,29 @@ def filter_images_by_confidence_score(model, DS_path, plot=True, create_DB=False
 
             confidences.extend(confidence.cpu().numpy())
 
-            for j, c in enumerate(confidence):
-                if c < conf_threshold:
-                    bad_indices.append(i * len(probs) + j)
+    fifth_percentile = np.percentile(confidences, 5)
+    confidences = np.array(confidences, dtype=np.float32)
+    sorted_idxs = confidences.argsort()
+    confidences = confidences[sorted_idxs]
+    low_conf = sorted_idxs[confidences < fifth_percentile]
+
+    dirty_data = [data.image_paths[i] for i in range(
+        len(data.image_paths)) if i in low_conf]
 
     clean_data = [data.image_paths[i] for i in range(
-        len(data.image_paths)) if i not in bad_indices]
+        len(data.image_paths)) if i not in low_conf]
 
-    print(f'{len(data.image_paths) - len(clean_data)} pictures will be removed from the DB, with conf_threshold = {conf_threshold}')
+    print(f'{len(data.image_paths) - len(clean_data)} pictures will be removed from the DB, with conf_threshold = {fifth_percentile}')
 
     if plot:
         plt.hist(confidences, bins=50)
-        plt.axvline(x=conf_threshold, color='red', linestyle='--')
+        plt.axvline(x=fifth_percentile, color='red', linestyle='--')
         plt.xlabel('Confidence Score')
         plt.ylabel('Count')
         plt.title('Distribution of Confidence Scores')
         plt.show()
+        plt.savefig(f'{output_path}/conf_dist.png')
 
     if create_DB:
-        copy_pictures_from_path_to_location(clean_data, 'confidence')
+        copy_pictures_from_path_to_location(clean_data, 'augmented-confidence')
+        copy_pictures_from_path_to_location(dirty_data, 'augmented-dirty-confidence')
