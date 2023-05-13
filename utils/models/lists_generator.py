@@ -16,12 +16,12 @@ optimizers_init = {"momentum": ['SGD'],
 
 def get_models_list():
     return [
-        # ('Resnet50', models.resnet50),
-        # ('Resnet18', models.resnet18),
-        # ('Resnet101', models.resnet101),
+        ('Resnet50', models.resnet50),
+        ('Resnet18', models.resnet18),
+        ('Resnet101', models.resnet101),
         ('VGG-16', models.vgg16),
-        # ('VGG-19', models.vgg19),
-        # ('Mobilenet-v2', models.mobilenet_v2)
+        ('VGG-19', models.vgg19),
+        ('Mobilenet-v2', models.mobilenet_v2)
     ]
 
 
