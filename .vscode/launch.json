@@ -1,39 +1,39 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Python: Research",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/research.py",
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "args": []
-        },
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Research",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/research.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": []
+    },
 
-        {
-            "name": "Python: Simple Run",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/run.py",
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "args": [
-                "--model",
-                "Resnet18",
+    {
+      "name": "Python: Simple Run",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/run.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": [
+        "--model",
+        "VGG-19",
 
-                "--optimizer",
-                "Adagrad",
+        "--optimizer",
+        "Adagrad",
 
-                "--learningRate",
-                "0.0001",
+        "--learningRate",
+        "0.0001",
 
-                "--loss",
-                "CrossEntropyLoss"
-            ]
-        }
-    ]
+        "--loss",
+        "CrossEntropyLoss"
+      ]
+    }
+  ]
 }
