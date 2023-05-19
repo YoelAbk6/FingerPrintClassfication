@@ -95,6 +95,9 @@ def main():
         best_test_accuracy = best_train_accuracy = 0
         best_y_pred, best_y_real = [], []
 
+        prev_epochs_preds = []
+        flipping_scores = [0] * len(train_dataloader.dataset)
+
         curr_model = init_model(model, model_name, device, num_classes)
         # Train and test loop
         for t in range(num_epochs):
@@ -102,12 +105,18 @@ def main():
             curr_optim = init_optimizer(
                 optimizer, optimizer_name, curr_model, lr)
 
-            accuracy_train, loss_train = train_loop(train_dataloader,
-                                                    curr_model,
-                                                    loss,
-                                                    curr_optim,
-                                                    device,
-                                                    out_dir)
+            accuracy_train, loss_train, current_epoch_preds = train_loop(train_dataloader,
+                                                                         curr_model,
+                                                                         loss,
+                                                                         curr_optim,
+                                                                         device,
+                                                                         out_dir)
+            if len(prev_epochs_preds) != 0:
+                flipping_scores = [score + (prev_pred != curr_pred) for score, prev_pred,
+                                   curr_pred in zip(flipping_scores, prev_epochs_preds, current_epoch_preds)]
+
+            prev_epochs_preds = current_epoch_preds
+
             accuracy_list_train.append(accuracy_train)
             loss_list_train.append(loss_train)
 
@@ -128,6 +137,25 @@ def main():
                 torch.save(curr_model.state_dict(), f'{out_dir}/my_model.pt')
 
             best_train_accuracy = max(best_train_accuracy, accuracy_train)
+
+        flipping_scores = [score / num_epochs for score in flipping_scores]
+
+        sorted_indices = sorted(range(len(flipping_scores)),
+                                key=lambda i: flipping_scores[i], reverse=True)
+
+        sorted_flipping_scores = [flipping_scores[i] for i in sorted_indices]
+
+        num_selected = int(len(sorted_flipping_scores) * 0.05)  # Select 5% of the flipping images
+        highest_flip = sorted_indices[:num_selected]
+
+        dirty_data = [data.image_paths[i] for i in range(
+            len(data.image_paths)) if i in highest_flip]
+
+        clean_data = [data.image_paths[i] for i in range(
+            len(data.image_paths)) if i not in highest_flip]
+
+        copy_pictures_from_path_to_location(clean_data, 'lowest-flip-rate')
+        copy_pictures_from_path_to_location(dirty_data, 'highest-flip-rate')
 
         # Handle outputs
         save_conf_matrix(

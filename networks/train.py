@@ -69,11 +69,15 @@ def train_loop(dataloader, model, loss_fn, optimizer, device, path, l2_lambda=0.
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     correct, train_loss = 0, 0
+    current_epoch_preds = []
     for batch, (X, y, paths) in enumerate(dataloader):
         # Compute prediction and loss
         pred = model(X)
         y = y.to(device)
         loss = loss_fn(pred, y)
+
+        current_epoch_preds.extend(pred.argmax(1).cpu())
+
         # Add L2 regularization
         l2_reg = None
         for param in model.parameters():
@@ -98,7 +102,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, device, path, l2_lambda=0.
     train_loss /= num_batches
     print_and_save(
         f"Train Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {train_loss:>8f} \n", path)
-    return 100 * correct, train_loss
+    return 100 * correct, train_loss, current_epoch_preds
 
 
 def test_loop(dataloader, model, loss_fn, device, path):
