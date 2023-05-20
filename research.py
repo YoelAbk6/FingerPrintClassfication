@@ -219,9 +219,21 @@ def filter_by_conf(DS_path, out_path):
 
 
 if __name__ == '__main__':
-    # main()
+    main()
     # evaluate()
-    clean('data/NIST302/auxiliary/flat/M/500/plain/png',
-          'out/NIST302a-M/simple_run_rs=4444/VGG-19')
-    # filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png',
-    #                'out/NIST302a-M/simple_run_rs=4444/VGG-19')
+    # clean('data/NIST302/auxiliary/flat/M/500/plain/png/inner50',
+    #       'out/NIST302a-M-inner50/simple_run_rs=4444/VGG-19-augmented')
+    # clean('data/NIST302/auxiliary/flat/M/500/plain/png/outer50',
+    #       'out/NIST302a-M-outer50/simple_run_rs=4444/VGG-19-augmented')
+    # clean('data/sd04/png_txt/inner50',
+    #       'out/NIST4-inner50/simple_run_rs=4444/VGG-19-augmented')
+    # clean('data/sd04/png_txt/outer50',
+    #       'out/NIST4-outer50/simple_run_rs=4444/VGG-19-augmented')
+    # filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png/inner50',
+    #                'out/NIST302a-M-inner50/simple_run_rs=4444/VGG-19-augmented')
+    # filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png/outer50',
+    #                'out/NIST302a-M-outer50/simple_run_rs=4444/VGG-19-augmented')
+    # filter_by_conf('data/sd04/png_txt/inner50',
+    #                'out/NIST4-inner50/simple_run_rs=4444/VGG-19-augmented')
+    # filter_by_conf('data/sd04/png_txt/outer50',
+    #                'out/NIST4-outer50/simple_run_rs=4444/VGG-19-augmented')

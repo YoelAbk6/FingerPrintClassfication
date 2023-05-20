@@ -25,7 +25,7 @@ TOP_ISSUES = 45
 
 def load_model(model_path):
     models = get_models_list()
-    input_model = model_path.split("/")[-2]
+    input_model = model_path.split("/")[-2].replace("-augmented", "")
     for model_name, model in models:
         if input_model == model_name:
             inited_model = init_model(model, model_name, device, 2)
@@ -98,7 +98,7 @@ def predict(model, DS_path):
 def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
     ood = OutOfDistribution()
 
-    data = CustomImageDataset(f'{DS_path}/all_data.txt', device, num_classes, use_file=True)
+    data = CustomImageDataset(DS_path, device, num_classes)
     dataloader = data.get_data()
 
     pred_probs = []
@@ -147,8 +147,7 @@ def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
 
 
 def filter_images_by_confidence_score(model, DS_path, output_path, plot=True, create_DB=False):
-    data = CustomImageDataset(
-        f'{DS_path}/all_data.txt', device, num_classes, use_file=True)
+    data = CustomImageDataset(DS_path, device, num_classes)
     dataloader = data.get_data()
     confidences = []
     with torch.no_grad():
