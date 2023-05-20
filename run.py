@@ -67,7 +67,7 @@ def main():
     num_classes = 2
 
     data_sets = get_data_sets_list()
-
+    
     model_name = args.model
     model = models.get(model_name)
     optimizer_name = args.optimizer
@@ -79,7 +79,7 @@ def main():
     # Loop through all datasets best model
     for DS_name, DS_path in data_sets:
 
-        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}-augmented/'
+        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}-augmented-search-lowest-flipping/'
         os.makedirs(out_dir, exist_ok=True)
 
         print_and_save(
@@ -141,21 +141,21 @@ def main():
         flipping_scores = [score / num_epochs for score in flipping_scores]
 
         sorted_indices = sorted(range(len(flipping_scores)),
-                                key=lambda i: flipping_scores[i], reverse=True)
+                                key=lambda i: flipping_scores[i], reverse=False)
 
         sorted_flipping_scores = [flipping_scores[i] for i in sorted_indices]
 
         num_selected = int(len(sorted_flipping_scores) * 0.05)  # Select 5% of the flipping images
-        highest_flip = sorted_indices[:num_selected]
-
-        dirty_data = [data.image_paths[i] for i in range(
-            len(data.image_paths)) if i in highest_flip]
+        lowest_flip = sorted_indices[:num_selected]
 
         clean_data = [data.image_paths[i] for i in range(
-            len(data.image_paths)) if i not in highest_flip]
+            len(data.image_paths)) if i in lowest_flip]
 
-        copy_pictures_from_path_to_location(clean_data, 'lowest-flip-rate')
-        copy_pictures_from_path_to_location(dirty_data, 'highest-flip-rate')
+        dirty_data = [data.image_paths[i] for i in range(
+            len(data.image_paths)) if i not in lowest_flip]
+
+        copy_pictures_from_path_to_location(dirty_data, 'worse-95-flip-rate')
+        copy_pictures_from_path_to_location(clean_data, 'best-5-flip-rate')
 
         # Handle outputs
         save_conf_matrix(
