@@ -67,7 +67,7 @@ def main():
     num_classes = 2
 
     data_sets = get_data_sets_list()
-    
+
     model_name = args.model
     model = models.get(model_name)
     optimizer_name = args.optimizer
@@ -145,17 +145,16 @@ def main():
 
         sorted_flipping_scores = [flipping_scores[i] for i in sorted_indices]
 
-        num_selected = int(len(sorted_flipping_scores) * 0.05)  # Select 5% of the flipping images
+        num_selected = int(len(sorted_flipping_scores) * 0.95)  # Select 95% of the flipping images
         lowest_flip = sorted_indices[:num_selected]
 
-        clean_data = [data.image_paths[i] for i in range(
-            len(data.image_paths)) if i in lowest_flip]
+        clean_data = [data.image_paths[train_dataloader.dataset.indices[lowest_flip[i]]]
+                      for i in range(num_selected)]
 
-        dirty_data = [data.image_paths[i] for i in range(
-            len(data.image_paths)) if i not in lowest_flip]
+        for i in range(len(test_dataloader.dataset.indices)):
+            clean_data.append(data.image_paths[test_dataloader.dataset.indices[i]])
 
-        copy_pictures_from_path_to_location(dirty_data, 'worse-95-flip-rate')
-        copy_pictures_from_path_to_location(clean_data, 'best-5-flip-rate')
+        copy_pictures_from_path_to_location(clean_data, 'best-95-flip-rate')
 
         # Handle outputs
         save_conf_matrix(
