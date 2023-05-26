@@ -143,6 +143,9 @@ def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
     clean_data = [data.image_paths[i] for i in range(
         len(data.image_paths)) if i not in ood_features_indices]
 
+    for i in range(len(test_dataloader.dataset.indices)):
+        clean_data.append(data.image_paths[test_dataloader.dataset.indices[i]])
+
     copy_pictures_from_path_to_location(clean_data, 'clean_lab-remove-train-only')
 
 
@@ -167,6 +170,9 @@ def filter_images_by_confidence_score(model, DS_path, output_path, plot=False, c
 
     data_to_save = [data.image_paths[train_dataloader.dataset.indices[high_conf[i]]]
                     for i in range(len(high_conf))]
+
+    for i in range(len(test_dataloader.dataset.indices)):
+        data_to_save.append(data.image_paths[test_dataloader.dataset.indices[i]])
 
     # dirty_data = [data.image_paths[i] for i in range(
     #     len(data.image_paths)) if i in low_conf]
