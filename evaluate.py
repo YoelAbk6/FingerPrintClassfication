@@ -174,10 +174,13 @@ def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
     copy_pictures_from_path_to_location(clean_data, 'clean_lab-remove-train-only')
 
 
-def filter_images_by_confidence_score(model, DS_path, output_path, plot=False, create_DB=True):
-    data = CustomImageDataset(DS_path, device, num_classes)
-    train_dataloader, test_dataloader = data.get_train_and_test_data()
-    # dataloader = data.get_data()
+def filter_images_by_confidence_score(model, train_DS_path, test_DS_path, output_path="", plot=False, create_DB=True):
+    # train_data = CustomImageDataset(train_DS_path, device, num_classes, use_file=True)
+    train_data = CustomImageDataset(train_DS_path, device, num_classes)
+    # test_data = CustomImageDataset(test_DS_path, device, num_classes, use_file=True)
+    test_data = CustomImageDataset(test_DS_path, device, num_classes)
+    train_dataloader, test_dataloader = train_data.get_train_data(), test_data.get_data()
+
     confidences = []
     with torch.no_grad():
         for i, (X, y, paths) in enumerate(train_dataloader):
@@ -191,21 +194,15 @@ def filter_images_by_confidence_score(model, DS_path, output_path, plot=False, c
     confidences = np.array(confidences, dtype=np.float32)
     sorted_idxs = confidences.argsort()
     confidences = confidences[sorted_idxs]
-    high_conf = sorted_idxs[confidences < fifth_percentile]
+    low_conf = sorted_idxs[confidences < fifth_percentile]
 
-    data_to_save = [data.image_paths[train_dataloader.dataset.indices[high_conf[i]]]
-                    for i in range(len(high_conf))]
+    data_to_save = [train_data.image_paths[low_conf[i]]
+                    for i in range(len(low_conf))]
 
-    for i in range(len(test_dataloader.dataset.indices)):
-        data_to_save.append(data.image_paths[test_dataloader.dataset.indices[i]])
+    for i in range(len(test_data.image_paths)):
+        data_to_save.append(test_data.image_paths[i])
 
-    # dirty_data = [data.image_paths[i] for i in range(
-    #     len(data.image_paths)) if i in low_conf]
-
-    # clean_data = [data.image_paths[i] for i in range(
-    #     len(data.image_paths)) if i not in low_conf]
-
-    print(f'{len(train_dataloader.dataset.indices) - len(data_to_save)} pictures will be removed from the DB, with conf_threshold = {fifth_percentile}')
+    print(f'{len(train_data.image_paths) - len(low_conf)} pictures will be removed from the DB, with conf_threshold = {fifth_percentile}')
 
     if plot:
         plt.hist(confidences, bins=50)
@@ -218,4 +215,3 @@ def filter_images_by_confidence_score(model, DS_path, output_path, plot=False, c
 
     if create_DB:
         copy_pictures_from_path_to_location(data_to_save, 'augmented-confidence-easiest')
-        # copy_pictures_from_path_to_location(dirty_data, 'augmented-dirty-confidence-easiest')
