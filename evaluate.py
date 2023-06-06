@@ -123,7 +123,7 @@ def predict(model, DS_path):
 def clean_lab(model, train_DS_path, output_path='', plot_dist=False, plot_top=False):
     ood = OutOfDistribution()
 
-    data = CustomImageDataset(train_DS_path, device, num_classes)
+    data = CustomImageDataset(train_DS_path, device, num_classes, use_file=True)
     # dataloader = data.get_data()
     train_dataloader = data.get_train_data()
     pred_probs = []
@@ -171,6 +171,7 @@ def clean_lab(model, train_DS_path, output_path='', plot_dist=False, plot_top=Fa
     # for i in range(len(test_dataloader.dataset.indices)):
     #     clean_data.append(data.image_paths[test_dataloader.dataset.indices[i]])
 
+    print(f'{len(data.image_paths) - len(clean_data)} pictures will be removed from the DB, with conf_threshold = {fifth_percentile}')
     copy_pictures_from_path_to_location(clean_data, 'clean_lab-final')
 
 
