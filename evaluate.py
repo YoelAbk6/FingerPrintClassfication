@@ -23,9 +23,13 @@ num_classes = 2
 TOP_ISSUES = 45
 
 
-def load_model(model_path):
+def load_model(model_path, VGG_19=True):
+    if VGG_19:
+        input_model = 'VGG-19'
+    else:
+        input_model = model_path.split("/")[-2].replace("-augmented", "")
+
     models = get_models_list()
-    input_model = model_path.split("/")[-2].replace("-augmented", "")
     for model_name, model in models:
         if input_model == model_name:
             inited_model = init_model(model, model_name, device, 2)
@@ -81,7 +85,7 @@ def predict(model, DS_path):
 
     data = CustomImageDataset(DS_path, device, num_classes, use_file=True)
     test_dataloader = data.get_data()
-
+    loss = nn.CrossEntropyLoss()
     size = len(test_dataloader.dataset)
     num_batches = len(test_dataloader)
     test_loss, correct = 0, 0
@@ -93,7 +97,7 @@ def predict(model, DS_path):
             y = y.to(device)
             pred = model(X)
             y_pred.extend(torch.argmax(pred, 1).data.cpu().numpy())
-            test_loss += nn.CrossEntropyLoss(pred, y).item()
+            test_loss += loss(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 
     test_loss /= num_batches
