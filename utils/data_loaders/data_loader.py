@@ -79,5 +79,21 @@ class CustomImageDataset(Dataset):
             train_dataset, batch_size=BATCH_SIZE, sampler=sampler), torch.utils.data.DataLoader(
             test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
+    def get_train_data(self):
+
+        # Get the class distribution of the train dataset
+        class_distribution = [0] * self.classes
+        for _, label, _ in self:
+            class_distribution[label] += 1
+
+        # Compute the weight of each sample in the train dataset
+        weights = [1.0 / class_distribution[label]
+                   for _, label, _ in self]
+
+        # Create a sampler using the computed weights
+        sampler = WeightedRandomSampler(weights, len(weights))
+        return torch.utils.data.DataLoader(
+            self, batch_size=BATCH_SIZE, sampler=sampler)
+
     def get_data(self):
         return torch.utils.data.DataLoader(self, batch_size=BATCH_SIZE, shuffle=False)

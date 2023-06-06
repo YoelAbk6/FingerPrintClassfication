@@ -77,9 +77,9 @@ def main():
     y_pred = y_real = None
 
     # Loop through all datasets best model
-    for DS_name, DS_path in data_sets:
+    for DS_name, train_DS_path, test_DS_path in data_sets:
 
-        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}-augmented-best-flip-fixed/'
+        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}-testSeparation'
         os.makedirs(out_dir, exist_ok=True)
 
         print_and_save(
@@ -89,8 +89,10 @@ def main():
         print_and_save(
             '=================================================================================================', out_dir)
 
-        data = CustomImageDataset(DS_path, device, num_classes)
-        train_dataloader, test_dataloader = data.get_train_and_test_data()
+        train_data = CustomImageDataset(train_DS_path, device, num_classes)
+        test_data = CustomImageDataset(test_DS_path, device, num_classes, use_file=True)
+
+        train_dataloader, test_dataloader = train_data.get_train_data(), test_data.get_data()
         accuracy_list_train, loss_list_train, accuracy_list_test, loss_list_test = [], [], [], []
         best_test_accuracy = best_train_accuracy = 0
         best_y_pred, best_y_real = [], []
@@ -149,7 +151,7 @@ def main():
         # lowest_flip = sorted_indices[:num_selected]
 
         # clean_data = [data.image_paths[train_dataloader.dataset.indices[lowest_flip[i]]]
-                    #   for i in range(num_selected)]
+            #   for i in range(num_selected)]
 
         # for i in range(len(test_dataloader.dataset.indices)):
         #     clean_data.append(data.image_paths[test_dataloader.dataset.indices[i]])
@@ -166,7 +168,7 @@ def main():
                                num_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
         save_performance_graph(loss_list_train, loss_list_test, num_epochs,
                                "Loss", f'{out_dir}/Loss_graph.png')
-        save_test_data(test_dataloader, out_dir)
+
         print_and_save(
             '=================================================================================================', out_dir)
         print_and_save(
