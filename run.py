@@ -79,7 +79,7 @@ def main():
     # Loop through all datasets best model
     for DS_name, train_DS_path, test_DS_path in data_sets:
 
-        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}-testSeparation'
+        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}-create-flip-easy'
         os.makedirs(out_dir, exist_ok=True)
 
         print_and_save(
@@ -97,8 +97,8 @@ def main():
         best_test_accuracy = best_train_accuracy = 0
         best_y_pred, best_y_real = [], []
 
-        # prev_epochs_preds = []
-        # flipping_scores = [0] * len(train_dataloader.dataset)
+        prev_epochs_preds = []
+        flipping_scores = [0] * len(train_dataloader.dataset)
 
         curr_model = init_model(model, model_name, device, num_classes)
         # Train and test loop
@@ -113,11 +113,11 @@ def main():
                                                                          curr_optim,
                                                                          device,
                                                                          out_dir)
-            # if len(prev_epochs_preds) != 0:
-            #     flipping_scores = [score + (prev_pred != curr_pred) for score, prev_pred,
-            #                        curr_pred in zip(flipping_scores, prev_epochs_preds, current_epoch_preds)]
+            if len(prev_epochs_preds) != 0:
+                flipping_scores = [score + (prev_pred != curr_pred) for score, prev_pred,
+                                   curr_pred in zip(flipping_scores, prev_epochs_preds, current_epoch_preds)]
 
-            # prev_epochs_preds = current_epoch_preds
+            prev_epochs_preds = current_epoch_preds
 
             accuracy_list_train.append(accuracy_train)
             loss_list_train.append(loss_train)
@@ -140,41 +140,38 @@ def main():
 
             best_train_accuracy = max(best_train_accuracy, accuracy_train)
 
-        # flipping_scores = [score / num_epochs for score in flipping_scores]
+        flipping_scores = [score / num_epochs for score in flipping_scores]
 
-        # sorted_indices = sorted(range(len(flipping_scores)),
-        #                         key=lambda i: flipping_scores[i], reverse=False) #False = best, True = worse
+        sorted_indices = sorted(range(len(flipping_scores)),
+                                key=lambda i: flipping_scores[i], reverse=False)  # False = east data created, True = hard data created
 
-        # sorted_flipping_scores = [flipping_scores[i] for i in sorted_indices]
+        sorted_flipping_scores = [flipping_scores[i] for i in sorted_indices]
 
-        # num_selected = int(len(sorted_flipping_scores) * 0.95)  # Select 95% of the flipping images
-        # lowest_flip = sorted_indices[:num_selected]
+        num_selected = int(len(sorted_flipping_scores) * 0.95)  # Select 95% of the flipping images
+        lowest_flip = sorted_indices[:num_selected]
 
-        # clean_data = [data.image_paths[train_dataloader.dataset.indices[lowest_flip[i]]]
-            #   for i in range(num_selected)]
+        clean_data = [train_data.image_paths[lowest_flip[i]]
+                      for i in range(num_selected)]
 
-        # for i in range(len(test_dataloader.dataset.indices)):
-        #     clean_data.append(data.image_paths[test_dataloader.dataset.indices[i]])
-
-        # copy_pictures_from_path_to_location(clean_data, 'best-95-flip-rate-train-only')
+        copy_pictures_from_path_to_location(clean_data, 'flip-easy-final')
 
         # Handle outputs
-        save_conf_matrix(
-            f'{out_dir}/Confusion_Matrix.png', best_y_real, best_y_pred)
+        # save_conf_matrix(
+        #     f'{out_dir}/Confusion_Matrix.png', best_y_real, best_y_pred)
 
-        save_classification_report(best_y_real, best_y_pred, f'{out_dir}/classification_report.txt')
+        # save_classification_report(best_y_real, best_y_pred, f'{out_dir}/classification_report.txt')
 
-        save_performance_graph(accuracy_list_train, accuracy_list_test,
-                               num_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
-        save_performance_graph(loss_list_train, loss_list_test, num_epochs,
-                               "Loss", f'{out_dir}/Loss_graph.png')
+        # save_performance_graph(accuracy_list_train, accuracy_list_test,
+        #                        num_epochs, "Accuracy", f'{out_dir}/Accuracy_graph.png')
+        # save_performance_graph(loss_list_train, loss_list_test, num_epochs,
+        #                        "Loss", f'{out_dir}/Loss_graph.png')
 
-        print_and_save(
-            '=================================================================================================', out_dir)
-        print_and_save(
-            f'Train {model_name} on {DS_name} is done\nBest accuracy train reached: {best_train_accuracy:>0.2f}%\nBest accuracy test reached: {best_test_accuracy:>0.2f}%\nModel is saved in best_model_state_dict', out_dir)
-        print_and_save(
-            '=================================================================================================', out_dir)
+        # print_and_save(
+        #     '=================================================================================================', out_dir)
+        # print_and_save(
+        #     f'Train {model_name} on {DS_name} is done\nBest accuracy train reached: {best_train_accuracy:>0.2f}%\nBest accuracy test reached: {best_test_accuracy:>0.2f}%\nModel is saved in best_model_state_dict', out_dir)
+        # print_and_save(
+        #     '=================================================================================================', out_dir)
 
     print("The run is done")
 
