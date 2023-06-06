@@ -13,7 +13,7 @@ torch.manual_seed(definitions.RANDOM_SEED)
 np.random.seed(definitions.RANDOM_SEED)
 random.seed(definitions.RANDOM_SEED)
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -21,7 +21,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 def main():
 
     search_best_model_epochs = 1
-    full_train_epochs = 15
+    full_train_epochs = 20
     num_classes = 2
     best_comb_occurences = defaultdict(int)
     best_comb_percentage = defaultdict(float)
@@ -209,7 +209,7 @@ def evaluate():
 def clean(DS_path, out_path):
     model = load_model(f'{out_path}/my_model.pt')
     model.eval()
-    clean_lab(model, DS_path, out_path, plot_dist=True, plot_top=False)
+    clean_lab(model, DS_path, out_path, plot_dist=False, plot_top=False)
 
 
 def filter_by_conf(DS_path, out_path):
@@ -219,16 +219,22 @@ def filter_by_conf(DS_path, out_path):
 
 
 if __name__ == '__main__':
-    main()
+    # main()
     # evaluate()
+    # clean('data/NIST302/auxiliary/flat/M/500/plain/png/regular',
+    #       'out/NIST302a-M/simple_run_rs=4444/VGG-19-augmented')
     # clean('data/NIST302/auxiliary/flat/M/500/plain/png/inner50',
     #       'out/NIST302a-M-inner50/simple_run_rs=4444/VGG-19-augmented')
     # clean('data/NIST302/auxiliary/flat/M/500/plain/png/outer50',
     #       'out/NIST302a-M-outer50/simple_run_rs=4444/VGG-19-augmented')
-    # clean('data/sd04/png_txt/inner50',
-    #       'out/NIST4-inner50/simple_run_rs=4444/VGG-19-augmented')
+    # clean('data/sd04/png_txt/figs',
+    #       'out/NIST4/simple_run_rs=4444/VGG-19-augmented')
     # clean('data/sd04/png_txt/outer50',
     #       'out/NIST4-outer50/simple_run_rs=4444/VGG-19-augmented')
+    filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png/regular',
+          'out/NIST302a-M/simple_run_rs=4444/VGG-19-augmented')
+    filter_by_conf('data/sd04/png_txt/figs',
+          'out/NIST4/simple_run_rs=4444/VGG-19-augmented')
     # filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png/inner50',
     #                'out/NIST302a-M-inner50/simple_run_rs=4444/VGG-19-augmented')
     # filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png/outer50',
