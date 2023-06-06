@@ -41,43 +41,81 @@ def get_learning_rates_list():
     return [('0.0001', 0.0001)]
 
 
+# "/home/uoriko/FingerPrintClassfication/data/test/NIST302_TestData.list"
+# "/home/uoriko/FingerPrintClassfication/data/test/NIST4_TestData.list"
+# "/home/uoriko/FingerPrintClassfication/data/test/SOCOfing_TestData.list"
+
+# name, train_path(folder), test_path(list)
 def get_data_sets_list():
     return [
-        # ("NIST302a-M", 'data/NIST302/auxiliary/flat/M/500/plain/png/regular'),
-        ("NIST302a-easiest-MOC", 'data/NIST302/auxiliary/flat/M/500/plain/png/augmented-confidence-easiest/regular'),
-        ("NIST302a-M-best-95-flip-rate-train-only", 'data/NIST302/auxiliary/flat/M/500/plain/png/best-95-flip-rate-train-only/regular'),
-        # ("NIST302a-M-worse-flip", 'data/NIST302/auxiliary/flat/M/500/plain/png/worse-95-flip-rate/regular'),
-        # ("NIST302a-M-clean", 'data/NIST302/auxiliary/flat/M/500/plain/png/clean_lab/regular'),
-        # ("NIST302a-M-inner50-clean", 'data/NIST302/auxiliary/flat/M/500/plain/png/clean_lab/inner50'),
-        # ("NIST302a-M-outer50-clean", 'data/NIST302/auxiliary/flat/M/500/plain/png/clean_lab/outer50'),
-        # ("NIST302a-M-inner50-confidence",
-        #  'data/NIST302/auxiliary/flat/M/500/plain/png/augmented-confidence/inner50'),
-        # ("NIST302a-M-outer50-confidence",
-        #  'data/NIST302/auxiliary/flat/M/500/plain/png/augmented-confidence/outer50'),
-        # ("NIST302a-M-confidence-augmented", 'data/NIST302/auxiliary/flat/M/500/plain/png/augmented-confidence/regular'),
-        # ("NIST302a-M-inner50", 'data/NIST302/auxiliary/flat/M/500/plain/png/inner50'),
-        # ("NIST302a-M-outer50", 'data/NIST302/auxiliary/flat/M/500/plain/png/outer50'),
-        # ("NIST302a-M-inner60", 'data/NIST302/auxiliary/flat/M/500/plain/png/inner60'),
-        # ("NIST302a-M-4-split-18to28", 'data/NIST302/auxiliary/flat/M/500/plain/png/age-4-split/18to28'),
-        # ("NIST302a-M-4-split-28to38", 'data/NIST302/auxiliary/flat/M/500/plain/png/age-4-split/28to38'),
-        # ("NIST302a-M-4-split-38to48", 'data/NIST302/auxiliary/flat/M/500/plain/png/age-4-split/38to48'),
-        # ("NIST302a-M-4-split-48to58", 'data/NIST302/auxiliary/flat/M/500/plain/png/age-4-split/48to58'),
-        # ("NIST4", 'data/sd04/png_txt/figs'),
-        ("NIST4-easiest-MOC", 'data/sd04/png_txt/augmented-confidence-easiest/figs/'),
-        ("NIST4-M-best-95-flip-rate-train-only", 'data/sd04/png_txt/best-95-flip-rate-train-only/figs/'),
-        # ("NIST4-worse-flip", 'data/sd04/png_txt/worse-95-flip-rate/figs'),
-        # ("NIST4-clean", 'data/sd04/png_txt/clean_lab/figs'),
-        # ("NIST4-inner50-clean", 'data/sd04/png_txt/clean_lab/inner50'),
-        # ("NIST4-outer50-clean", 'data/sd04/png_txt/clean_lab/outer50'),
-        # ("NIST4-inner50-confidence", 'data/sd04/png_txt/augmented-confidence/inner50'),
-        # ("NIST4-outer50-confidence", 'data/sd04/png_txt/augmented-confidence/outer50'),
-        # ("NIST4-confidence-augmented", 'data/sd04/png_txt/augmented-confidence/figs'),
-        # ("NIST4-inner50", 'data/sd04/png_txt/inner50'),
-        # ("NIST4-outer50", 'data/sd04/png_txt/outer50'),
-        # ("NIST4-inner60", 'data/sd04/png_txt/inner60')
-        # ("SOCOfing", 'data/SOCOFing/Real'),
-        # ("SOCOfing-confidence-augmented", 'data/SOCOFing/augmented-confidence/Real'),
-        # ("SOCOFing-inner50", 'data/SOCOFing/inner50'),
-        # ("SOCOFing-outer50", 'data/SOCOFing/outer50'),
-        # ("SOCOFing-inner60", 'data/SOCOFing/inner60'),
+        # ("NIST302a-M",
+        #  "/home/uoriko/FingerPrintClassfication/data/train/NIST302_TrainData.list",
+        #  "/home/uoriko/FingerPrintClassfication/data/test/NIST302_TestData.list"),
+        # ("NIST4",
+        #  "/home/uoriko/FingerPrintClassfication/data/train/NIST4_TrainData.list",
+        #  "/home/uoriko/FingerPrintClassfication/data/test/NIST4_TestData.list"),
+        # ("SOCOfing",
+        #  "/home/uoriko/FingerPrintClassfication/data/train/SOCOfing_TrainData.list",
+        #  "/home/uoriko/FingerPrintClassfication/data/test/SOCOfing_TestData.list"),
+        ("NIST302a-M-MOC-hard-final",
+         "/home/uoriko/FingerPrintClassfication/data/NIST302/auxiliary/flat/M/500/plain/png/MOC-hard-data-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/NIST302_TestData.list"),
+
+        ("NIST302a-M-MOC-easy-final",
+         "/home/uoriko/FingerPrintClassfication/data/NIST302/auxiliary/flat/M/500/plain/png/MOC-easy-data-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/NIST302_TestData.list"),
+
+        ("NIST302a-M-clean-lab-final",
+         "/home/uoriko/FingerPrintClassfication/data/NIST302/auxiliary/flat/M/500/plain/png/clean_lab-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/NIST302_TestData.list"),
+
+        ("NIST302a-M-flip-easy-final",
+         "/home/uoriko/FingerPrintClassfication/data/NIST302/auxiliary/flat/M/500/plain/png/flip-easy-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/NIST302_TestData.list"),
+
+        ("NIST302a-M-flip-hard-final",
+         "/home/uoriko/FingerPrintClassfication/data/NIST302/auxiliary/flat/M/500/plain/png/flip-hard-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/NIST302_TestData.list"),
+
+
+        ("NIST4-MOC-hard-final",
+         "/home/uoriko/FingerPrintClassfication/data/sd04/png_txt/MOC-hard-data-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/NIST4_TestData.list"),
+
+        ("NIST4-MOC-easy-final",
+         "/home/uoriko/FingerPrintClassfication/data/sd04/png_txt/MOC-easy-data-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/NIST4_TestData.list"),
+
+        ("NIST4-clean-lab-final",
+         "/home/uoriko/FingerPrintClassfication/data/sd04/png_txt/clean_lab-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/NIST4_TestData.list"),
+
+        ("NIST4-flip-easy-final",
+         "/home/uoriko/FingerPrintClassfication/data/sd04/png_txt/flip-easy-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/NIST4_TestData.list"),
+
+        ("NIST4-flip-hard-final",
+         "/home/uoriko/FingerPrintClassfication/data/sd04/png_txt/flip-hard-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/NIST4_TestData.list"),
+
+
+        ("SOCOfing-MOC-hard-final",
+         "/home/uoriko/FingerPrintClassfication/data/SOCOFing/MOC-hard-data-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/SOCOfing_TestData.list"),
+
+        ("SOCOfing-MOC-easy-final",
+         "/home/uoriko/FingerPrintClassfication/data/SOCOFing/MOC-easy-data-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/SOCOfing_TestData.list"),
+
+        ("SOCOfing-clean-lab-final",
+         "/home/uoriko/FingerPrintClassfication/data/SOCOFing/clean_lab-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/SOCOfing_TestData.list"),
+
+        ("SOCOfing-flip-easy-final",
+         "/home/uoriko/FingerPrintClassfication/data/SOCOFing/flip-easy-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/SOCOfing_TestData.list"),
+
+        ("SOCOfing-flip-hard-final",
+         "/home/uoriko/FingerPrintClassfication/data/SOCOFing/flip-hard-final/",
+         "/home/uoriko/FingerPrintClassfication/data/test/SOCOfing_TestData.list"),
     ]
