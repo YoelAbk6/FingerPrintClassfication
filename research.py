@@ -195,15 +195,12 @@ def main():
     print("The run is done")
 
 
-def evaluate():
+def evaluate(model_path, DS_path):
 
-    for root, dirs, files in os.walk("./out/VGG-19"):
-        for file in files:
-            if file.endswith('.pt'):
-                model = load_model(os.path.join(root, file))
-                model.eval()
-                if model is not None:
-                    predict(model, './out/NIST4/best_model_performance/VGG-19/testList.txt')
+    model = load_model(model_path)
+    if model is not None:
+        model.eval()
+        predict(model, DS_path)
 
 
 def clean(DS_path, out_path):
@@ -221,6 +218,10 @@ def filter_by_conf(DS_path, out_path):
 if __name__ == '__main__':
     # main()
     # evaluate()
+    evaluate('/home/uoriko/FingerPrintClassfication/out/NIST4-M-hardest-cleanlab/simple_run_rs=4444/VGG-19-augmented-worse-flip-fixed/my_model.pt',
+             "/home/uoriko/FingerPrintClassfication/data/test/NIST4_TestData.list")
+    evaluate("/home/uoriko/FingerPrintClassfication/out/NIST302a-M-hardest-cleanlab/simple_run_rs=4444/VGG-19-augmented-worse-flip-fixed/my_model.pt",
+             "/home/uoriko/FingerPrintClassfication/data/test/NIST302_TestData.list")
     # clean('data/NIST302/auxiliary/flat/M/500/plain/png/regular',
     #       'out/NIST302a-M/simple_run_rs=4444/VGG-19-augmented')
     # clean('data/NIST302/auxiliary/flat/M/500/plain/png/inner50',
@@ -231,10 +232,10 @@ if __name__ == '__main__':
     #       'out/NIST4/simple_run_rs=4444/VGG-19-augmented')
     # clean('data/sd04/png_txt/outer50',
     #       'out/NIST4-outer50/simple_run_rs=4444/VGG-19-augmented')
-    filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png/regular',
-          'out/NIST302a-M/simple_run_rs=4444/VGG-19-augmented')
-    filter_by_conf('data/sd04/png_txt/figs',
-          'out/NIST4/simple_run_rs=4444/VGG-19-augmented')
+    # filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png/regular',
+    #                'out/NIST302a-M/simple_run_rs=4444/VGG-19-augmented')
+    # filter_by_conf('data/sd04/png_txt/figs',
+    #    'out/NIST4/simple_run_rs=4444/VGG-19-augmented')
     # filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png/inner50',
     #                'out/NIST302a-M-inner50/simple_run_rs=4444/VGG-19-augmented')
     # filter_by_conf('data/NIST302/auxiliary/flat/M/500/plain/png/outer50',
