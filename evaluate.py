@@ -120,12 +120,12 @@ def predict(model, DS_path):
     #         show_side_by_side(imgs)
 
 
-def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
+def clean_lab(model, train_DS_path, output_path='', plot_dist=False, plot_top=False):
     ood = OutOfDistribution()
 
-    data = CustomImageDataset(DS_path, device, num_classes)
+    data = CustomImageDataset(train_DS_path, device, num_classes)
     # dataloader = data.get_data()
-    train_dataloader, test_dataloader = data.get_train_and_test_data()
+    train_dataloader = data.get_train_data()
     pred_probs = []
     labels = []
 
@@ -168,17 +168,15 @@ def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
     clean_data = [data.image_paths[i] for i in range(
         len(data.image_paths)) if i not in ood_features_indices]
 
-    for i in range(len(test_dataloader.dataset.indices)):
-        clean_data.append(data.image_paths[test_dataloader.dataset.indices[i]])
+    # for i in range(len(test_dataloader.dataset.indices)):
+    #     clean_data.append(data.image_paths[test_dataloader.dataset.indices[i]])
 
-    copy_pictures_from_path_to_location(clean_data, 'clean_lab-remove-train-only')
+    copy_pictures_from_path_to_location(clean_data, 'clean_lab-final')
 
 
 def filter_images_by_confidence_score(model, train_DS_path, test_DS_path, output_path="", plot=False, create_DB=True):
-    # train_data = CustomImageDataset(train_DS_path, device, num_classes, use_file=True)
-    train_data = CustomImageDataset(train_DS_path, device, num_classes)
-    # test_data = CustomImageDataset(test_DS_path, device, num_classes, use_file=True)
-    test_data = CustomImageDataset(test_DS_path, device, num_classes)
+    train_data = CustomImageDataset(train_DS_path, device, num_classes, use_file=True)
+    test_data = CustomImageDataset(test_DS_path, device, num_classes, use_file=True)
     train_dataloader, test_dataloader = train_data.get_train_data(), test_data.get_data()
 
     confidences = []
@@ -199,8 +197,8 @@ def filter_images_by_confidence_score(model, train_DS_path, test_DS_path, output
     data_to_save = [train_data.image_paths[low_conf[i]]
                     for i in range(len(low_conf))]
 
-    for i in range(len(test_data.image_paths)):
-        data_to_save.append(test_data.image_paths[i])
+    # for i in range(len(test_data.image_paths)):
+    #     data_to_save.append(test_data.image_paths[i])
 
     print(f'{len(train_data.image_paths) - len(low_conf)} pictures will be removed from the DB, with conf_threshold = {fifth_percentile}')
 

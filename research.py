@@ -203,10 +203,10 @@ def evaluate(model_path, DS_path):
         predict(model, DS_path)
 
 
-def clean(DS_path, out_path):
-    model = load_model(f'{out_path}/my_model.pt')
+def clean(model_path, train_DS_path, out_path=''):
+    model = load_model(model_path)
     model.eval()
-    clean_lab(model, DS_path, out_path, plot_dist=False, plot_top=False)
+    clean_lab(model, train_DS_path, out_path, plot_dist=False, plot_top=False)
 
 
 def filter_by_conf(model_path, train_DS_path, test_DS_path, out_path=''):
