@@ -162,11 +162,11 @@ def filter_images_by_confidence_score(model, DS_path, output_path, plot=False, c
 
             confidences.extend(confidence.cpu().numpy())
 
-    fifth_percentile = np.percentile(confidences, 5)
+    fifth_percentile = np.percentile(confidences, 95)
     confidences = np.array(confidences, dtype=np.float32)
     sorted_idxs = confidences.argsort()
     confidences = confidences[sorted_idxs]
-    high_conf = sorted_idxs[confidences > fifth_percentile]
+    high_conf = sorted_idxs[confidences < fifth_percentile]
 
     data_to_save = [data.image_paths[train_dataloader.dataset.indices[high_conf[i]]]
                     for i in range(len(high_conf))]
@@ -192,5 +192,5 @@ def filter_images_by_confidence_score(model, DS_path, output_path, plot=False, c
         plt.savefig(f'{output_path}/conf_dist.png')
 
     if create_DB:
-        copy_pictures_from_path_to_location(data_to_save, 'augmented-confidence-hardest')
+        copy_pictures_from_path_to_location(data_to_save, 'augmented-confidence-easiest')
         # copy_pictures_from_path_to_location(dirty_data, 'augmented-dirty-confidence-easiest')

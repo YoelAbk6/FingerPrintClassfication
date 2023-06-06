@@ -13,7 +13,7 @@ torch.manual_seed(definitions.RANDOM_SEED)
 np.random.seed(definitions.RANDOM_SEED)
 random.seed(definitions.RANDOM_SEED)
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -79,7 +79,7 @@ def main():
     # Loop through all datasets best model
     for DS_name, DS_path in data_sets:
 
-        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}-augmented-search-lowest-flipping/'
+        out_dir = f'./out/{DS_name}/simple_run_rs={definitions.RANDOM_SEED}/{model_name}-augmented-best-flip-fixed/'
         os.makedirs(out_dir, exist_ok=True)
 
         print_and_save(
@@ -95,8 +95,8 @@ def main():
         best_test_accuracy = best_train_accuracy = 0
         best_y_pred, best_y_real = [], []
 
-        prev_epochs_preds = []
-        flipping_scores = [0] * len(train_dataloader.dataset)
+        # prev_epochs_preds = []
+        # flipping_scores = [0] * len(train_dataloader.dataset)
 
         curr_model = init_model(model, model_name, device, num_classes)
         # Train and test loop
@@ -111,11 +111,11 @@ def main():
                                                                          curr_optim,
                                                                          device,
                                                                          out_dir)
-            if len(prev_epochs_preds) != 0:
-                flipping_scores = [score + (prev_pred != curr_pred) for score, prev_pred,
-                                   curr_pred in zip(flipping_scores, prev_epochs_preds, current_epoch_preds)]
+            # if len(prev_epochs_preds) != 0:
+            #     flipping_scores = [score + (prev_pred != curr_pred) for score, prev_pred,
+            #                        curr_pred in zip(flipping_scores, prev_epochs_preds, current_epoch_preds)]
 
-            prev_epochs_preds = current_epoch_preds
+            # prev_epochs_preds = current_epoch_preds
 
             accuracy_list_train.append(accuracy_train)
             loss_list_train.append(loss_train)
@@ -138,23 +138,23 @@ def main():
 
             best_train_accuracy = max(best_train_accuracy, accuracy_train)
 
-        flipping_scores = [score / num_epochs for score in flipping_scores]
+        # flipping_scores = [score / num_epochs for score in flipping_scores]
 
-        sorted_indices = sorted(range(len(flipping_scores)),
-                                key=lambda i: flipping_scores[i], reverse=False)
+        # sorted_indices = sorted(range(len(flipping_scores)),
+        #                         key=lambda i: flipping_scores[i], reverse=False) #False = best, True = worse
 
-        sorted_flipping_scores = [flipping_scores[i] for i in sorted_indices]
+        # sorted_flipping_scores = [flipping_scores[i] for i in sorted_indices]
 
-        num_selected = int(len(sorted_flipping_scores) * 0.95)  # Select 95% of the flipping images
-        lowest_flip = sorted_indices[:num_selected]
+        # num_selected = int(len(sorted_flipping_scores) * 0.95)  # Select 95% of the flipping images
+        # lowest_flip = sorted_indices[:num_selected]
 
-        clean_data = [data.image_paths[train_dataloader.dataset.indices[lowest_flip[i]]]
-                      for i in range(num_selected)]
+        # clean_data = [data.image_paths[train_dataloader.dataset.indices[lowest_flip[i]]]
+                    #   for i in range(num_selected)]
 
-        for i in range(len(test_dataloader.dataset.indices)):
-            clean_data.append(data.image_paths[test_dataloader.dataset.indices[i]])
+        # for i in range(len(test_dataloader.dataset.indices)):
+        #     clean_data.append(data.image_paths[test_dataloader.dataset.indices[i]])
 
-        copy_pictures_from_path_to_location(clean_data, 'best-95-flip-rate')
+        # copy_pictures_from_path_to_location(clean_data, 'best-95-flip-rate-train-only')
 
         # Handle outputs
         save_conf_matrix(
