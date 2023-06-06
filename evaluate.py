@@ -82,17 +82,38 @@ def predict(model, DS_path):
     data = CustomImageDataset(DS_path, device, num_classes, use_file=True)
     test_dataloader = data.get_data()
 
+    size = len(test_dataloader.dataset)
+    num_batches = len(test_dataloader)
+    test_loss, correct = 0, 0
+    y_pred, y_true = [], []
+
     with torch.no_grad():
         for X, y, paths in test_dataloader:
+            y_true.extend(y.data.numpy())
             y = y.to(device)
             pred = model(X)
-            imgs = []
-            for path, label, predicted in zip(paths, y, pred.argmax(1) == y):
-                if len(imgs) < 16:
-                    title = f'{M if label == 1 else F} - {str(predicted.item())}'
-                    imgs.append(
-                        (np.array(Image.open(path).convert('RGB')), title))
-            show_side_by_side(imgs)
+            y_pred.extend(torch.argmax(pred, 1).data.cpu().numpy())
+            test_loss += nn.CrossEntropyLoss(pred, y).item()
+            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+
+    test_loss /= num_batches
+    correct /= size
+
+    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    # print_and_save(
+    #     f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n", path)
+
+    # with torch.no_grad():
+    #     for X, y, paths in test_dataloader:
+    #         y = y.to(device)
+    #         pred = model(X)
+    #         imgs = []
+    #         for path, label, predicted in zip(paths, y, pred.argmax(1) == y):
+    #             if len(imgs) < 16:
+    #                 title = f'{M if label == 1 else F} - {str(predicted.item())}'
+    #                 imgs.append(
+    #                     (np.array(Image.open(path).convert('RGB')), title))
+    #         show_side_by_side(imgs)
 
 
 def clean_lab(model, DS_path, output_path, plot_dist=False, plot_top=False):
